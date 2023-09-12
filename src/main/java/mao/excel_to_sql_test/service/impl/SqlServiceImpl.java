@@ -1,4 +1,4 @@
-package mao.excel_to_sql_test.service.impl.impl;
+package mao.excel_to_sql_test.service.impl;
 
 import mao.excel_to_sql_test.entity.ExcelData;
 import mao.excel_to_sql_test.service.ExcelService;
@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.PropertyPlaceholderHelper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 /**
  * Project name(项目名称)：excel-to-sqltest
@@ -38,8 +37,9 @@ public class SqlServiceImpl implements SqlService
     private ExcelService excelService;
 
     @Override
-    public void excelToSql(String template) throws IOException
+    public List<String> excelToSql(String template) throws IOException
     {
+        List<String> sqlList = new ArrayList<>();
         ExcelData excelData = excelService.loadExcel();
         log.debug("模板：" + template);
         List<String> titles = excelData.getTitles();
@@ -50,7 +50,9 @@ public class SqlServiceImpl implements SqlService
             Properties properties = new Properties();
             rowMap.forEach(properties::setProperty);
             String result = helper.replacePlaceholders(template, properties);
+            sqlList.add(result);
             log.debug("记录：" + result);
         });
+        return sqlList;
     }
 }

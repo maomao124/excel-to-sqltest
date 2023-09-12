@@ -1,4 +1,4 @@
-package mao.excel_to_sql_test.service.impl.impl;
+package mao.excel_to_sql_test.service.impl;
 
 import mao.excel_to_sql_test.service.SqlService;
 import org.junit.jupiter.api.Test;
