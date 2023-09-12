@@ -1,8 +1,10 @@
 package mao.excel_to_sql_test.service.impl;
 
+import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.service.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedWriter;
@@ -31,10 +33,13 @@ public class FileServiceImpl implements FileService
 {
     private static final Logger log = LoggerFactory.getLogger(FileServiceImpl.class);
 
+    @Autowired
+    private BaseConfigurationProperties baseConfigurationProperties;
+
     @Override
     public void write(List<String> sqlList)
     {
-        String path = "./out.sql";
+        String path = baseConfigurationProperties.getOutputPath();
         log.debug("文件位置：" + path);
         try (FileOutputStream fileOutputStream = new FileOutputStream(path);
              OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
@@ -42,12 +47,18 @@ public class FileServiceImpl implements FileService
         {
             for (String sql : sqlList)
             {
-                if (sql.contains("where put_id='Noinfo'"))
-                {
-                    continue;
-                }
                 bufferedWriter.write(sql);
-                bufferedWriter.write("\n\n");
+                if (baseConfigurationProperties.getWrapNum() >= 0)
+                {
+                    for (int i = 0; i < baseConfigurationProperties.getWrapNum(); i++)
+                    {
+                        bufferedWriter.write("\n");
+                    }
+                }
+                else
+                {
+                    bufferedWriter.write("\n\n");
+                }
                 log.debug("写入到文件：" + sql);
             }
             bufferedWriter.flush();

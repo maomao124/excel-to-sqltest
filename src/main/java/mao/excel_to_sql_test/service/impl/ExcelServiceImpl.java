@@ -1,5 +1,6 @@
 package mao.excel_to_sql_test.service.impl;
 
+import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
 import mao.excel_to_sql_test.service.ExcelService;
 import org.apache.poi.ss.usermodel.Row;
@@ -8,6 +9,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -35,21 +37,31 @@ public class ExcelServiceImpl implements ExcelService
      */
     private static final Logger log = LoggerFactory.getLogger(ExcelServiceImpl.class);
 
+    @Autowired
+    private BaseConfigurationProperties baseConfigurationProperties;
+
+
     @Override
     public ExcelData loadExcel() throws IOException
     {
-        int firstRow = 0;
+        int firstRow = baseConfigurationProperties.getExcel().getStartRow();
         //加载工作簿
-        Workbook workbook = new XSSFWorkbook(new FileInputStream("in.xlsx"));
-        //读取第一个工作表
-        Sheet sheet = workbook.getSheetAt(firstRow);
+        Workbook workbook = new XSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
+        //读取工作表
+        Sheet sheet = workbook.getSheetAt(baseConfigurationProperties.getExcel().getSheetAt());
         //得到最后一行
         int lastRowNum = sheet.getLastRowNum();
-        //得到第0行
-        Row row = sheet.getRow(0);
+        if (baseConfigurationProperties.getExcel().getEndRow() > 0)
+        {
+            lastRowNum = baseConfigurationProperties.getExcel().getEndRow();
+        }
+        //得到开始行
+        Row row = sheet.getRow(firstRow);
         //列开始位置和列结束位置
-        short firstCellNum = row.getFirstCellNum();
-        short lastCellNum = row.getLastCellNum();
+        short firstCellNum = baseConfigurationProperties.getExcel().getStartCell() > 0 ?
+                (short) baseConfigurationProperties.getExcel().getStartCell() : row.getFirstCellNum();
+        short lastCellNum = baseConfigurationProperties.getExcel().getEndCell() > 0 ?
+                (short) baseConfigurationProperties.getExcel().getEndCell() : row.getLastCellNum();
         log.debug("开始列：" + (firstCellNum + 1));
         log.debug("结束列：" + (lastCellNum + 1));
         //填充表头

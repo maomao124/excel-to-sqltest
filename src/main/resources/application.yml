@@ -35,3 +35,19 @@ logging:
   # pattern:
   # console: "%d %clr(%p) --- [%16t] %clr(%-40.40c){cyan} : %m %n"
 
+
+
+ets:
+  inputPath: './in.xlsx'
+  outputPath: './out.sql'
+  isWriteToMysql: false
+  wrapNum: 1
+  excel:
+    sheetAt: 0
+    startRow: 0
+    endRow: -1
+    startCell: 0
+    endCell: -1
+  filter:
+    '': ['','','']
+
