@@ -101,7 +101,15 @@ public class ExcelServiceImpl implements ExcelService
                         }
                         catch (Exception exx)
                         {
-                            value = String.valueOf(row.getCell(i1).getBooleanCellValue());
+                            try
+                            {
+                                value = String.valueOf(row.getCell(i1).getBooleanCellValue());
+                            }
+                            catch (Exception exxx)
+                            {
+                                log.warn("导入(" + i + "," + i1 + ")位置的数据时发生问题 ", exxx);
+                                value = "";
+                            }
                         }
                     }
                 }

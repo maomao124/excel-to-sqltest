@@ -40,7 +40,7 @@ public class FileServiceImpl implements FileService
     public void write(List<String> sqlList)
     {
         String path = baseConfigurationProperties.getOutputPath();
-        log.debug("文件位置：" + path);
+        log.debug("输出文件位置：" + path);
         try (FileOutputStream fileOutputStream = new FileOutputStream(path);
              OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
              BufferedWriter bufferedWriter = new BufferedWriter(outputStreamWriter))

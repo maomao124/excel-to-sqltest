@@ -34,6 +34,11 @@ public class BaseConfigurationProperties
     private String outputPath = "./out.sql";
 
     /**
+     * 模版日志
+     */
+    private String templateLogPath = "./template.log";
+
+    /**
      * 是否生成文件后，还要将数据更新到mysql数据库里（执行sql语句）
      */
     private boolean isWriteToMysql = false;
@@ -120,6 +125,17 @@ public class BaseConfigurationProperties
     public BaseConfigurationProperties setWrapNum(int wrapNum)
     {
         this.wrapNum = wrapNum;
+        return this;
+    }
+
+    public String getTemplateLogPath()
+    {
+        return templateLogPath;
+    }
+
+    public BaseConfigurationProperties setTemplateLogPath(String templateLogPath)
+    {
+        this.templateLogPath = templateLogPath;
         return this;
     }
 
