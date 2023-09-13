@@ -3,6 +3,7 @@ package mao.excel_to_sql_test.service.impl;
 import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
 import mao.excel_to_sql_test.service.ExcelService;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -44,7 +45,20 @@ public class ExcelServiceImpl implements ExcelService
     @Override
     public ExcelData loadExcel() throws IOException
     {
+        log.debug("文件:" + baseConfigurationProperties.getInputPath());
         int firstRow = baseConfigurationProperties.getExcel().getStartRow();
+        if (baseConfigurationProperties.getInputPath().endsWith(".xls"))
+        {
+            //加载低版本工作簿
+            log.debug("加载低版本excel");
+            Workbook workbook = new HSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
+        }
+        else
+        {
+            //加载工作簿
+            log.debug("加载高版本excel");
+            Workbook workbook = new XSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
+        }
         //加载工作簿
         Workbook workbook = new XSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
         //读取工作表
@@ -107,7 +121,7 @@ public class ExcelServiceImpl implements ExcelService
                             }
                             catch (Exception exxx)
                             {
-                                log.warn("导入(" + i + "," + i1 + ")位置的数据时发生问题 ", exxx);
+                                log.warn("导入(" + i + "," + i1 + ")位置的数据时发生问题 :"+ exxx.getMessage());
                                 value = "";
                             }
                         }
