@@ -1,6 +1,7 @@
 package mao.excel_to_sql_test.service.impl;
 
 import mao.excel_to_sql_test.config.BaseConfigurationProperties;
+import mao.excel_to_sql_test.entity.ExcelData;
 import mao.excel_to_sql_test.service.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Project name(项目名称)：excel-to-sqltest
@@ -57,5 +59,41 @@ public class TemplateServiceImpl implements TemplateService
         {
             logger.error("写入到文件时发生错误：", e);
         }
+    }
+
+    @Override
+    public String buildDefaultTemplate(ExcelData excelData, String tableName)
+    {
+        return buildDefaultTemplate(excelData.getTitles(), tableName);
+    }
+
+    @Override
+    public String buildDefaultTemplate(List<String> titles, String tableName)
+    {
+        StringBuilder template = new StringBuilder();
+        template.append("insert into ")
+                .append(tableName)
+                .append(" ")
+                .append("(")
+                .append(titles.get(0));
+        for (int i = 1; i < titles.size(); i++)
+        {
+            template.append(",")
+                    .append(titles.get(i));
+        }
+        template.append(") values(")
+                .append("${")
+                .append(titles.get(0))
+                .append("}");
+        for (int i = 1; i < titles.size(); i++)
+        {
+            template.append(",")
+                    .append("${")
+                    .append(titles.get(i))
+                    .append("}");
+        }
+        template.append(");");
+        logger.debug("生成的默认模板：" + template);
+        return template.toString();
     }
 }

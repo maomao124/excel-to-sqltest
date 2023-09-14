@@ -37,10 +37,9 @@ public class SqlServiceImpl implements SqlService
     private ExcelService excelService;
 
     @Override
-    public List<String> excelToSql(String template) throws IOException
+    public List<String> excelToSql(String template, ExcelData excelData) throws IOException
     {
         List<String> sqlList = new ArrayList<>();
-        ExcelData excelData = excelService.loadExcel();
         log.debug("模板：" + template);
         List<String> titles = excelData.getTitles();
         List<Map<String, String>> content = excelData.getContent();
@@ -54,5 +53,12 @@ public class SqlServiceImpl implements SqlService
             log.debug("记录：" + result);
         });
         return sqlList;
+    }
+
+    @Override
+    public List<String> excelToSql(String template) throws IOException
+    {
+        ExcelData excelData = excelService.loadExcel();
+        return excelToSql(template, excelData);
     }
 }

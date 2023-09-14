@@ -1,5 +1,7 @@
 package mao.excel_to_sql_test.service;
 
+import mao.excel_to_sql_test.entity.ExcelData;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -22,8 +24,19 @@ public interface SqlService
     /**
      * 将excel的数据变成sql insert语句
      *
-     * @param template 模板数据
+     * @param template  模板数据
+     * @param excelData Excel数据对象
      * @return SQL列表
+     * @throws IOException
+     */
+    List<String> excelToSql(String template, ExcelData excelData) throws IOException;
+
+    /**
+     * 将excel的数据变成sql insert语句
+     *
+     * @param template  模板数据
+     * @return SQL列表
+     * @throws IOException
      */
     List<String> excelToSql(String template) throws IOException;
 }

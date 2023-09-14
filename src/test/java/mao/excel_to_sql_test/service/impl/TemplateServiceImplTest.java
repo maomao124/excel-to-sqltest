@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,5 +35,16 @@ class TemplateServiceImplTest
     void writeTemplateLog() throws IOException
     {
         templateService.writeTemplateLog("insert into tableName values(${姓名},${性别},${年龄})");
+    }
+
+    @Test
+    void buildDefaultTemplate()
+    {
+        List<String> list = new ArrayList<>();
+        list.add("id");
+        list.add("name");
+        list.add("sex");
+        list.add("age");
+        System.out.println(templateService.buildDefaultTemplate(list, "student"));
     }
 }

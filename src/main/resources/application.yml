@@ -49,5 +49,6 @@ ets:
     startCell: 0
     endCell: -1
   filter:
-    '编码': ['Noinfo','NotOnly','N000004-446-1151']
+    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
+    "[所属班级]": ['100001']
 

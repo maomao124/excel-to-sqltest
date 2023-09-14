@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Project name(项目名称)：excel-to-sqltest
@@ -121,7 +122,7 @@ public class ExcelServiceImpl implements ExcelService
                             }
                             catch (Exception exxx)
                             {
-                                log.warn("导入(" + i + "," + i1 + ")位置的数据时发生问题 :"+ exxx.getMessage());
+                                log.warn("导入(" + i + "," + i1 + ")位置的数据时发生问题 :" + exxx.getMessage());
                                 value = "";
                             }
                         }
@@ -129,10 +130,50 @@ public class ExcelServiceImpl implements ExcelService
                 }
                 rowMap.put(iterator.next(), value);
             }
-            log.debug("第" + (i + 1) + "行数据：" + rowMap);
-            content.add(rowMap);
+            if (isIgnore(rowMap))
+            {
+                //忽略
+                log.info("忽略第" + (i + 1) + "行数据：" + rowMap);
+            }
+            else
+            {
+                log.debug("第" + (i + 1) + "行数据：" + rowMap);
+                content.add(rowMap);
+            }
         }
 
         return new ExcelData().setTitles(titles).setContent(content);
+    }
+
+    /**
+     * 是否忽略当前行
+     *
+     * @param rowMap 行数据
+     * @return boolean 要忽略为是
+     */
+    private boolean isIgnore(Map<String, String> rowMap)
+    {
+        Map<String, List<String>> filter = baseConfigurationProperties.getFilter();
+        AtomicBoolean isIgnore = new AtomicBoolean(false);
+        rowMap.forEach((title, value) ->
+        {
+            //判断该列的表头是否在过滤列表里
+            if (filter.get(title) == null)
+            {
+                //不在过滤列表，直接下一个
+                return;
+            }
+            //表头在过滤列表里
+            List<String> list = filter.get(title);
+            for (String s : list)
+            {
+                if (s.equals(value))
+                {
+                    isIgnore.set(true);
+                    return;
+                }
+            }
+        });
+        return isIgnore.get();
     }
 }

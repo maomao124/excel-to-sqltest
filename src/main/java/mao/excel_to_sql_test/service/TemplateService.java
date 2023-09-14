@@ -1,7 +1,10 @@
 package mao.excel_to_sql_test.service;
 
+import mao.excel_to_sql_test.entity.ExcelData;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Project name(项目名称)：excel-to-sqltest
@@ -24,4 +27,22 @@ public interface TemplateService
      * @param template 模板
      */
     void writeTemplateLog(String template) throws IOException;
+
+    /**
+     * 根据excel字段构建默认模板
+     *
+     * @param excelData excel数据
+     * @param tableName 数据库表名称
+     * @return {@link String}
+     */
+    String buildDefaultTemplate(ExcelData excelData, String tableName);
+
+    /**
+     * 根据excel字段构建默认模板
+     *
+     * @param titles    excel标题
+     * @param tableName 数据库表名称
+     * @return {@link String}
+     */
+    String buildDefaultTemplate(List<String> titles, String tableName);
 }

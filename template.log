@@ -1,0 +1,10 @@
+2023-09-13 09:08:17		./template.log		insert into tableName values(${姓名},${性别},${年龄})
+2023-09-13 09:09:10		./in.xlsx		insert into tableName values(${姓名},${性别},${年龄})
+2023-09-13 09:09:25		./in.xlsx		insert into tableName values(${姓名},${性别},${年龄})
+2023-09-14 10:09:21		./in2.xlsx		update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';
+2023-09-14 10:11:17		./in2.xlsx		update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';
+2023-09-14 10:11:45		./in2.xlsx		update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';
+2023-09-14 10:12:45		./in2.xlsx		update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';
+2023-09-14 10:35:33		./in2.xlsx		update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';
+2023-09-14 10:45:21		./in2.xlsx		update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';
+2023-09-14 10:47:27		./in2.xlsx		update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';
