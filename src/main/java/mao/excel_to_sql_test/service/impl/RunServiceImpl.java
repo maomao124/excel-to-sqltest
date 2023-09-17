@@ -63,7 +63,7 @@ public class RunServiceImpl implements RunService
     }
 
     @Override
-    public void run(String template) throws IOException
+    public void run(String template) throws Exception
     {
         showConfig();
         ExcelData excelData = excelService.loadExcel();

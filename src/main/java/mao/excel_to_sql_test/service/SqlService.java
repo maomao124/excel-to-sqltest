@@ -29,7 +29,7 @@ public interface SqlService
      * @return SQL列表
      * @throws IOException
      */
-    List<String> excelToSql(String template, ExcelData excelData) throws IOException;
+    List<String> excelToSql(String template, ExcelData excelData) throws Exception;
 
     /**
      * 将excel的数据变成sql insert语句
@@ -38,5 +38,5 @@ public interface SqlService
      * @return SQL列表
      * @throws IOException
      */
-    List<String> excelToSql(String template) throws IOException;
+    List<String> excelToSql(String template) throws Exception;
 }

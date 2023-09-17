@@ -4,6 +4,7 @@ import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
 import mao.excel_to_sql_test.service.ExcelService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -106,25 +107,27 @@ public class ExcelServiceImpl implements ExcelService
                 {
                     try
                     {
-                        value = String.valueOf(row.getCell(i1).getNumericCellValue());
+                        if (DateUtil.isCellDateFormatted(row.getCell(i1)))
+                        {
+                            Date date = row.getCell(i1).getDateCellValue();
+                            value = String.valueOf(date.getTime());
+                        }
+                        else
+                        {
+                            value = String.valueOf(row.getCell(i1).getNumericCellValue());
+                        }
                     }
                     catch (Exception ex)
                     {
+
                         try
                         {
-                            value = String.valueOf(row.getCell(i1).getDateCellValue());
+                            value = String.valueOf(row.getCell(i1).getBooleanCellValue());
                         }
-                        catch (Exception exx)
+                        catch (Exception exxx)
                         {
-                            try
-                            {
-                                value = String.valueOf(row.getCell(i1).getBooleanCellValue());
-                            }
-                            catch (Exception exxx)
-                            {
-                                log.warn("导入(" + i + "," + i1 + ")位置的数据时发生问题 :" + exxx.getMessage());
-                                value = "";
-                            }
+                            log.warn("导入(" + i + "," + i1 + ")位置的数据时发生问题 :" + exxx.getMessage());
+                            value = "";
                         }
                     }
                 }

@@ -29,12 +29,12 @@ class SqlServiceImplTest
     private SqlService sqlService;
 
     @Test
-    void excelToSql() throws IOException
+    void excelToSql() throws Exception
     {
         sqlService.excelToSql("insert into tableName values(${姓名},${性别},${年龄})");
     }
     @Test
-    void excelToSql2() throws IOException
+    void excelToSql2() throws Exception
     {
         sqlService.excelToSql("insert into gameLog values(${FPS},${Time},${FrameTime},${CPU Power [W]},${GPU Power [W]});");
     }

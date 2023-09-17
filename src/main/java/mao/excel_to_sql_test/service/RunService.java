@@ -32,6 +32,6 @@ public interface RunService
      *
      * @param template 模板
      */
-    void run(String template) throws IOException;
+    void run(String template) throws Exception;
 
 }

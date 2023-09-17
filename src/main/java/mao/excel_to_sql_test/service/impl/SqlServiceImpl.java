@@ -3,6 +3,7 @@ package mao.excel_to_sql_test.service.impl;
 import mao.excel_to_sql_test.entity.ExcelData;
 import mao.excel_to_sql_test.service.ExcelService;
 import mao.excel_to_sql_test.service.SqlService;
+import mao.excel_to_sql_test.service.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,29 +35,38 @@ public class SqlServiceImpl implements SqlService
     private static final Logger log = LoggerFactory.getLogger(SqlServiceImpl.class);
 
     @Autowired
+    private TemplateService templateService;
+
+    @Autowired
     private ExcelService excelService;
 
     @Override
-    public List<String> excelToSql(String template, ExcelData excelData) throws IOException
+    public List<String> excelToSql(String template, ExcelData excelData) throws Exception
     {
         List<String> sqlList = new ArrayList<>();
         log.debug("模板：" + template);
         List<String> titles = excelData.getTitles();
         List<Map<String, String>> content = excelData.getContent();
-        content.forEach(rowMap ->
+        /*content.forEach(rowMap ->
         {
-            PropertyPlaceholderHelper helper = new PropertyPlaceholderHelper("${", "}");
-            Properties properties = new Properties();
-            rowMap.forEach(properties::setProperty);
-            String result = helper.replacePlaceholders(template, properties);
+            String result = templateService.parseTemplate(template, rowMap);
             sqlList.add(result);
             log.debug("记录：" + result);
-        });
+        });*/
+        int index = 1;
+        for (Map<String, String> rowMap : content)
+        {
+            rowMap.put("_index", String.valueOf(index));
+            String result = templateService.parseTemplate(template, rowMap);
+            sqlList.add(result);
+            log.debug("记录：" + result);
+            index++;
+        }
         return sqlList;
     }
 
     @Override
-    public List<String> excelToSql(String template) throws IOException
+    public List<String> excelToSql(String template) throws Exception
     {
         ExcelData excelData = excelService.loadExcel();
         return excelToSql(template, excelData);

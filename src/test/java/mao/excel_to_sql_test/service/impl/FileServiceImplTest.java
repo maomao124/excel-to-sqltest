@@ -35,7 +35,7 @@ class FileServiceImplTest
     private SqlService sqlService;
 
     @Test
-    void write() throws IOException
+    void write() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("update base_put set image12='${备注}' where put_id='${编码}';");
         fileService.write(sqlList);
@@ -47,7 +47,7 @@ class FileServiceImplTest
      * @throws IOException IOException
      */
     @Test
-    void write2() throws IOException
+    void write2() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("select * from base_village where village_name='${小区/村名称}';");
         fileService.write(sqlList);
@@ -60,7 +60,7 @@ class FileServiceImplTest
      * @throws IOException IOException
      */
     @Test
-    void write3() throws IOException
+    void write3() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("'${小区/村名称}',");
         fileService.write(sqlList);
@@ -72,7 +72,7 @@ class FileServiceImplTest
      * @throws IOException IOException
      */
     @Test
-    void write4() throws IOException
+    void write4() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("update base_village set village_name='${change_village_name}' where village_code='${village_code}' and village_name='${village_name}';");
         fileService.write(sqlList);
@@ -84,7 +84,7 @@ class FileServiceImplTest
      * @throws IOException IOException
      */
     @Test
-    void write5() throws IOException
+    void write5() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("update base_village set village_name='${village_name}' where village_code='${village_code}';");
         fileService.write(sqlList);
@@ -96,7 +96,7 @@ class FileServiceImplTest
      * @throws IOException IOException
      */
     @Test
-    void write6() throws IOException
+    void write6() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';");
         fileService.write(sqlList);
@@ -109,7 +109,7 @@ class FileServiceImplTest
      * @throws IOException IOException
      */
     @Test
-    void write7() throws IOException
+    void write7() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("update base_put set put_name='${投放点名称}',village_name='${小区/村名称}' where put_code='${投放点编号}';");
         fileService.write(sqlList);
@@ -121,14 +121,14 @@ class FileServiceImplTest
      * @throws IOException
      */
     @Test
-    void write8() throws IOException
+    void write8() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("'${投放点编号}',");
         fileService.write(sqlList);
     }
 
     @Test
-    void write9() throws IOException
+    void write9() throws Exception
     {
         List<String> sqlList = sqlService.excelToSql("insert into gameLog values(${FPS},${Time},${FrameTime},${CPU Power [W]},${GPU Power [W]});");
         fileService.write(sqlList);

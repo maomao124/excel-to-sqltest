@@ -30,7 +30,7 @@ class RunServiceImplTest
     private RunService runService;
 
     @Test
-    void run() throws IOException
+    void run() throws Exception
     {
         runService.run("update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';");
     }
@@ -58,7 +58,7 @@ class RunServiceImplTest
                         {
                             runService.run("insert into gameLog values(${FPS},${Time},${FrameTime},${CPU Power [W]},${GPU Power [W]});");
                         }
-                        catch (IOException e)
+                        catch (Exception e)
                         {
                             e.printStackTrace();
                         }
@@ -68,5 +68,23 @@ class RunServiceImplTest
             }).start();
         }
         countDownLatch.await();
+    }
+
+    @Test
+    void run3() throws Exception
+    {
+        runService.run("insert into gameLog values(${FPS},${Time},${FrameTime},${(_index?number*2+100000)?c});");
+    }
+
+    @Test
+    void run4() throws Exception
+    {
+        runService.run("insert into gameLog values(${FPS},${(_index?number*2+100000)?c},${.vars['CPU Temp']});");
+    }
+
+    @Test
+    void run5() throws Exception
+    {
+        runService.run("insert into gameLog values(${FPS},${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')},${FrameTime},${(_index?number*2+100000)?c});");
     }
 }
