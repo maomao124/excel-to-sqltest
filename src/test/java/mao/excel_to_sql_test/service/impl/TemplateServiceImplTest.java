@@ -1,5 +1,6 @@
 package mao.excel_to_sql_test.service.impl;
 
+import freemarker.template.TemplateException;
 import mao.excel_to_sql_test.service.TemplateService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -46,5 +49,35 @@ class TemplateServiceImplTest
         list.add("sex");
         list.add("age");
         System.out.println(templateService.buildDefaultTemplate(list, "student"));
+    }
+
+    @Test
+    void parseTemplate() throws Exception
+    {
+        Map<String, String> map = new HashMap<>();
+        map.put("tableName", "stu");
+        map.put("名字", "张三");
+        String s = templateService.parseTemplate("insert into ${tableName} values('${名字}');", map);
+        System.out.println(s);
+    }
+
+    @Test
+    void parseTemplate2() throws Exception
+    {
+        Map<String, String> map = new HashMap<>();
+        map.put("tableName", "stu");
+        map.put("名字", "张三");
+        String s = templateService.parseTemplate("insert into ${'tb_'+tableName} values('${名字}');", map);
+        System.out.println(s);
+    }
+
+    @Test
+    void parseTemplate3() throws Exception
+    {
+        Map<String, String> map = new HashMap<>();
+        map.put("tableName", "stu");
+        map.put("名字", "张三");
+        String s = templateService.parseTemplate("insert into ${'tb_'+tableName} ${1+1} values('${名字}');", map);
+        System.out.println(s);
     }
 }

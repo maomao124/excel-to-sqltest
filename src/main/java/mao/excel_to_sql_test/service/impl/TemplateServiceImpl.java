@@ -1,7 +1,12 @@
 package mao.excel_to_sql_test.service.impl;
 
+import freemarker.cache.StringTemplateLoader;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.service.TemplateEngineService;
 import mao.excel_to_sql_test.service.TemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Project name(项目名称)：excel-to-sqltest
@@ -36,6 +42,9 @@ public class TemplateServiceImpl implements TemplateService
 
     @Autowired
     private BaseConfigurationProperties baseConfigurationProperties;
+
+    @Autowired
+    private TemplateEngineService templateEngineService;
 
     @Override
     public void writeTemplateLog(String template) throws IOException
@@ -95,5 +104,11 @@ public class TemplateServiceImpl implements TemplateService
         template.append(");");
         logger.debug("生成的默认模板：" + template);
         return template.toString();
+    }
+
+    @Override
+    public String parseTemplate(String template, Map<String, String> map) throws Exception
+    {
+        return templateEngineService.parse(template, map);
     }
 }

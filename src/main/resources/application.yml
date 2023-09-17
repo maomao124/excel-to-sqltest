@@ -38,13 +38,13 @@ logging:
 
 
 ets:
-  inputPath: './in2.xlsx'
+  inputPath: './in4.xlsx'
   outputPath: './out.sql'
   isWriteToMysql: false
   wrapNum: 1
   excel:
     sheetAt: 0
-    startRow: 2
+    startRow: 0
     endRow: -1
     startCell: 0
     endCell: -1

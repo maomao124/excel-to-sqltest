@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,5 +33,40 @@ class RunServiceImplTest
     void run() throws IOException
     {
         runService.run("update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';");
+    }
+
+    /**
+     * 测试并发问题
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Test
+    void run2() throws IOException, InterruptedException
+    {
+        CountDownLatch countDownLatch = new CountDownLatch(10);
+        for (int i = 0; i < 32; i++)
+        {
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    for (int i = 0; i < 100; i++)
+                    {
+                        try
+                        {
+                            runService.run("insert into gameLog values(${FPS},${Time},${FrameTime},${CPU Power [W]},${GPU Power [W]});");
+                        }
+                        catch (IOException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    countDownLatch.countDown();
+                }
+            }).start();
+        }
+        countDownLatch.await();
     }
 }

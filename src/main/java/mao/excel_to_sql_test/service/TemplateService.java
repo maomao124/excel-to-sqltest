@@ -1,10 +1,12 @@
 package mao.excel_to_sql_test.service;
 
+import freemarker.template.TemplateException;
 import mao.excel_to_sql_test.entity.ExcelData;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Project name(项目名称)：excel-to-sqltest
@@ -45,4 +47,13 @@ public interface TemplateService
      * @return {@link String}
      */
     String buildDefaultTemplate(List<String> titles, String tableName);
+
+    /**
+     * 解析模板
+     *
+     * @param template 要解析的模板
+     * @param map      参数
+     * @return {@link String}
+     */
+    String parseTemplate(String template, Map<String, String> map) throws Exception;
 }

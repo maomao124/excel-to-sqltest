@@ -33,4 +33,9 @@ class SqlServiceImplTest
     {
         sqlService.excelToSql("insert into tableName values(${姓名},${性别},${年龄})");
     }
+    @Test
+    void excelToSql2() throws IOException
+    {
+        sqlService.excelToSql("insert into gameLog values(${FPS},${Time},${FrameTime},${CPU Power [W]},${GPU Power [W]});");
+    }
 }
