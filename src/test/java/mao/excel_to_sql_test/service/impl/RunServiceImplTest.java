@@ -87,4 +87,10 @@ class RunServiceImplTest
     {
         runService.run("insert into gameLog values(${FPS},${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')},${FrameTime},${(_index?number*2+100000)?c});");
     }
+
+    @Test
+    void run6() throws Exception
+    {
+        runService.run("insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)");
+    }
 }

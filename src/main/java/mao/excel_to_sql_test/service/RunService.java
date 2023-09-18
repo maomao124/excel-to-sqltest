@@ -23,9 +23,14 @@ public interface RunService
     void showConfig();
 
     /**
+     * 显示提示信息
+     */
+    void showTip();
+
+    /**
      * 运行入口
      */
-    void run();
+    void run() throws Exception;
 
     /**
      * 运行入口
