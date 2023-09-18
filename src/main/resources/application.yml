@@ -2,11 +2,15 @@
 spring:
   # 配置数据源
   datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/test
-      username: root
-      password: 20010713
+  freemarker:
+    check-template-location: false
+#    druid:
+#      driver-class-name: com.mysql.cj.jdbc.Driver
+#      url: jdbc:mysql://localhost:3306/test
+#      username: root
+#      password: 123456
+
+
 
 # 设置日志级别，root表示根节点，即整体应用日志级别
 logging:
@@ -20,7 +24,7 @@ logging:
   logback:
     rollingpolicy:
       #最大文件大小
-      max-file-size: 16KB
+      max-file-size: 160KB
       # 文件格式
       file-name-pattern: logs/server_log/%d{yyyy/MM月/dd日/}%i.log
   # 设置日志组
