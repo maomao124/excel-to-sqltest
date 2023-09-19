@@ -123,10 +123,15 @@ public class RunServiceImpl implements RunService
         log.info("开始写入到sql文件");
         fileService.write(sqlList);
         log.info("数据全部写入完成");
+        templateService.writeTemplateLog(template);
         if (baseConfigurationProperties.isWriteToMysql())
         {
             log.info("将sql语句写入到数据库");
             sqlDao.save(sqlList);
+        }
+        else
+        {
+            log.info("跳过执行sql步骤");
         }
         log.info("任务完成");
     }
@@ -139,5 +144,15 @@ public class RunServiceImpl implements RunService
         List<String> sqlList = sqlService.excelToSql(template, excelData);
         fileService.write(sqlList);
         templateService.writeTemplateLog(template);
+        if (baseConfigurationProperties.isWriteToMysql())
+        {
+            log.info("将sql语句写入到数据库");
+            sqlDao.save(sqlList);
+        }
+        else
+        {
+            log.info("跳过执行sql步骤");
+        }
+        log.info("任务完成");
     }
 }

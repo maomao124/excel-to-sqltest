@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 /**
@@ -34,7 +36,60 @@ public class BaseJdbcSqlDaoImpl implements SqlDao
     public boolean save(List<String> sqlList) throws Exception
     {
         log.info("开始执行sql");
-        //todo
+        Connection connection = null;
+        try
+        {
+            log.debug("获取数据库连接");
+            connection = dataSource.getConnection();
+            log.debug("开启事务");
+            connection.setAutoCommit(false);
+            for (String sql : sqlList)
+            {
+                save(sql, connection);
+            }
+            log.debug("执行成功，提交事务");
+            connection.commit();
+        }
+        catch (Exception e)
+        {
+            log.error("", e);
+            log.debug("产生错误，回滚事务");
+            if (connection != null)
+            {
+                connection.rollback();
+            }
+        }
+        finally
+        {
+            if (connection != null)
+            {
+                log.debug("关闭连接");
+                connection.close();
+            }
+        }
         return true;
+    }
+
+    /**
+     * 执行sql
+     *
+     * @param sql        sql语句
+     * @param connection 连接
+     * @return int 影响行数
+     * @throws Exception 异常
+     */
+    private int save(String sql, Connection connection) throws Exception
+    {
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        int update = preparedStatement.executeUpdate();
+        if (update != 1)
+        {
+            log.warn("sql语句'" + sql + "'执行成功，但是影响行数为" + update);
+        }
+        else
+        {
+            log.debug("sql语句'" + sql + "'执行成功");
+        }
+        return update;
     }
 }
