@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
 
 /**
  * Project name(项目名称)：excel-to-sqltest
@@ -145,7 +146,57 @@ public class ExcelServiceImpl implements ExcelService
             }
         }
 
+        //去重
+        content = distinct(titles, content);
+        //排序
+        if (baseConfigurationProperties.getOrderBy() != null)
+        {
+            String orderBy = baseConfigurationProperties.getOrderBy();
+            //是否包含英文逗号
+            if (orderBy.contains(","))
+            {
+                String[] split = orderBy.split(",");
+                //todo
+            }
+        }
+
         return new ExcelData().setTitles(titles).setContent(content);
+    }
+
+    /**
+     * 字段去重
+     *
+     * @param titles  表头
+     * @param content 内容
+     * @return {@link List}<{@link Map}<{@link String}, {@link String}>>
+     */
+    private List<Map<String, String>> distinct(List<String> titles, List<Map<String, String>> content)
+    {
+        if (baseConfigurationProperties.getDistinct() != null)
+        {
+            String field = baseConfigurationProperties.getDistinct();
+            Map<String, Map<String, String>> map = new HashMap<>();
+            //判断是否在表头里存在
+            if (titles.contains(field))
+            {
+                //存在
+                for (Map<String, String> stringStringMap : content)
+                {
+                    map.put(stringStringMap.get(field), stringStringMap);
+                }
+                List<Map<String, String>> list = new ArrayList<>();
+                map.forEach(new BiConsumer<String, Map<String, String>>()
+                {
+                    @Override
+                    public void accept(String s, Map<String, String> map)
+                    {
+                        list.add(map);
+                    }
+                });
+                content = list;
+            }
+        }
+        return content;
     }
 
     /**

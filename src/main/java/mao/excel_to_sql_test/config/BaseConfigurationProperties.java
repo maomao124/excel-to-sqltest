@@ -49,6 +49,16 @@ public class BaseConfigurationProperties
     private int wrapNum = 2;
 
     /**
+     * 要去重的列
+     */
+    private String distinct = null;
+
+    /**
+     * 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+     */
+    private String orderBy = null;
+
+    /**
      * 过滤器，如果不想要条件为xxx的行数据，则可以通过此字段过滤
      * 比如学生表中，不想要性别为男的行数据(只要性别为女的)，假设表头名称为'sex'，那么结构应该为
      * <pre>
@@ -150,5 +160,26 @@ public class BaseConfigurationProperties
         return this;
     }
 
+    public String getDistinct()
+    {
+        return distinct;
+    }
+
+    public BaseConfigurationProperties setDistinct(String distinct)
+    {
+        this.distinct = distinct;
+        return this;
+    }
+
+    public String getOrderBy()
+    {
+        return orderBy;
+    }
+
+    public BaseConfigurationProperties setOrderBy(String orderBy)
+    {
+        this.orderBy = orderBy;
+        return this;
+    }
 }
 
