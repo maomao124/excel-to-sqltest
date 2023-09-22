@@ -132,4 +132,39 @@ class RunServiceImplTest
     {
         runService.run("INSERT INTO `th_db`.`car_arrange_line` (`collector_user_id`, `collector_user_name`, `line_name`, `collector_car_name`, `line_phone`, `add_userid`, `add_date`, `modify_userid`, `modify_date`, `tenant_id`, `collector_car_id`, `car_arrange_id`, `collection_line_id`, `car_arrange_line_id`, `daily_count`, `api_map_id`, `high_speed`, `down_date`, `up_date`, `memo`, `line_time`) VALUES (NULL, '${司机}', NULL, '${车牌号}', '${联系电话?number?c}', NULL, '2023-09-19 00:00:00', NULL, NULL, 'N000017', (SELECT dosscard_id FROM car_dosscard WHERE dev_num='${车牌号}' AND dept_name='永宁项目'), (select car_arrange_id FROM car_arrange WHERE year='${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}' AND dept_name='永宁项目'), NULL, 'lzcd00${(_index?number+205)?c}', 0, NULL, NULL, NULL, NULL, '永宁项目', '${收运时间段}');");
     }
+
+    /**
+     * 插入用户表
+     *
+     * @throws Exception
+     */
+    @Test
+    void run12() throws Exception
+    {
+        runService.run("insert into sys_user (user_id,user_name,id_code,add_date,tenant_id,dept_id,dept_name) values('${(_index?number+2207040178)?c}','${司机}','${身份证号码}','2023-09-21 00:00:00','N000017','N000017-100100090020','雷州项目');");
+    }
+
+    /**
+     * 查询id语句的in内容
+     *
+     * @throws Exception
+     */
+    @Test
+    void run13() throws Exception
+    {
+        runService.run("" +
+                "'${身份证号码}'," +
+                ""); }
+
+    /**
+     * 测试去重和排序
+     * @throws Exception
+     */
+    @Test
+    void run14() throws Exception
+    {
+        runService.run("" +
+                "'${FPS}'," +
+                ""); }
+
 }

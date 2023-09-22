@@ -81,6 +81,8 @@ public class RunServiceImpl implements RunService
                 "  outputPath: './out.sql'    # sql文件的输出路径\n" +
                 "  isWriteToMysql: false      # 是否直接执行输出的sql文件\n" +
                 "  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\\n的个数\n" +
+                "  distinct: ''               # 要去重的字段\n" +
+                "  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'\n" +
                 "  excel:\n" +
                 "    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1\n" +
                 "    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3\n" +

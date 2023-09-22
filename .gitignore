@@ -1,4 +1,6 @@
 HELP.md
+*.xls
+*.xlsx
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
