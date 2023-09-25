@@ -38,8 +38,8 @@ class RunServiceImplTest
     /**
      * 测试并发问题
      *
-     * @throws IOException
-     * @throws InterruptedException
+     * @throws IOException          异常
+     * @throws InterruptedException 异常
      */
     @Test
     void run2() throws IOException, InterruptedException
@@ -136,7 +136,7 @@ class RunServiceImplTest
     /**
      * 插入用户表
      *
-     * @throws Exception
+     * @throws Exception 异常
      */
     @Test
     void run12() throws Exception
@@ -147,24 +147,100 @@ class RunServiceImplTest
     /**
      * 查询id语句的in内容
      *
-     * @throws Exception
+     * @throws Exception 异常
      */
     @Test
     void run13() throws Exception
     {
         runService.run("" +
                 "'${身份证号码}'," +
-                ""); }
+                "");
+    }
 
     /**
      * 测试去重和排序
-     * @throws Exception
+     *
+     * @throws Exception 异常
      */
     @Test
     void run14() throws Exception
     {
         runService.run("" +
                 "'${FPS}'," +
-                ""); }
+                "");
+    }
 
+    /**
+     * 导入雷州一体化部门人员档案信息
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run15() throws Exception
+    {
+        runService.run("" +
+                "insert into sys_user " +
+                "(user_id,user_code,tenant_id,add_date,phone_code," +
+                "user_name,id_code,sex,nation,politics,linkman_phone," +
+                "address,dept_name,dept_id,pory_type,entry_date,contract_limit,driver_code," +
+                "native_place,household_registration,now_address,date_this_unit," +
+                "subject_name,contract_start_time,contract_end_time,sign_contract_number," +
+                "auditing) values('${(_index?number+202210120346)?c}','${联系电话?number?c}'," +
+                "'N000017',NOW(),'${联系电话?number?c}','${姓名}','${身份证号码}','" +
+                "<#if 性别=='男'>1</#if><#if 性别=='女'>0</#if>','${民族}'," +
+                "'<#if 政治面貌=='群众'>3</#if><#if 政治面貌=='共青团员'>2</#if><#if 政治面貌=='中共党员'>" +
+                "1</#if><#if 政治面貌=='无党派人士'>4</#if><#if 政治面貌=='民主党派'>5</#if>'," +
+                "'${联系电话?number?c}','${户籍地址}','雷州项目'," +
+                "(select dept_id from sys_dept where dept_name='雷州项目')," +
+                "'${岗位类型}','${入职日期?number?number_to_datetime?string('yyyy/MM/dd')}'," +
+                "'${合同期限?number?number_to_datetime?string('yyyy/MM/dd')}','${驾驶证件号}'," +
+                "'${籍贯}','<#if 户籍=='本地城镇'>1</#if><#if 户籍=='本地农村'>2</#if><#if 户籍=='外地城镇'>3</#if>" +
+                "<#if 户籍=='外地农村'>4</#if>','${现住地址}'," +
+                "'${到本单位日期?number?number_to_datetime?string('yyyy/MM/dd')}'," +
+                "'${合同主体}','${合同开始日期?number?number_to_datetime?string('yyyy/MM/dd')}'," +
+                "'${合同结束日期?number?number_to_datetime?string('yyyy/MM/dd')}'," +
+                "'${第几次签合同?number}','1');" +
+                "");
+    }
+
+    /**
+     * 查询雷州一体化部门人员档案信息的in语句内容
+     * select * from sys_user where user_id in()
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run16() throws Exception
+    {
+        runService.run("" +
+                "'${(_index?number+202210120346)?c}'," +
+                "");
+    }
+
+
+    /**
+     * 雷州一体化部门人员档案信息添加移动手机号字段
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run17() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set mob_code='${联系电话?number?c}' where user_id='${(_index?number+202210120346)?c}';" +
+                "");
+    }
+
+    /**
+     * 雷州一体化部门人员档案信息添加duty字段
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run18() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set duty='${岗位类型}' where user_id='${(_index?number+202210120346)?c}';" +
+                "");
+    }
 }

@@ -42,12 +42,12 @@ logging:
 
 
 ets:
-  inputPath: './in4.xlsx'    # excel文件的路径
+  inputPath: './in5.xlsx'    # excel文件的路径
   outputPath: './out.sql'    # sql文件的输出路径
   isWriteToMysql: false      # 是否直接执行输出的sql文件
   wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
-  distinct: ''               # 要去重的字段
-  orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  #distinct: ''               # 要去重的字段
+  #orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
   excel:
     sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
     startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
@@ -57,4 +57,5 @@ ets:
   filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
     "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
     "[所属班级]": ['100001']
+    "[联系电话]": ['']
 
