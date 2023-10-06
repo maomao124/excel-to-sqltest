@@ -146,12 +146,6 @@ public class ExcelServiceImpl implements ExcelService
                 content.add(rowMap);
             }
         }
-
-        //去重
-        content = distinct(titles, content);
-        //排序
-        fieldSort(titles, content);
-
         return new ExcelData().setTitles(titles).setContent(content);
     }
 
@@ -182,105 +176,6 @@ public class ExcelServiceImpl implements ExcelService
         workbook.write(new FileOutputStream(fileName));
         workbook.close();
         return true;
-    }
-
-    /**
-     * 排序
-     *
-     * @param titles  表头
-     * @param content 内容
-     */
-    private void fieldSort(List<String> titles, List<Map<String, String>> content)
-    {
-        if (baseConfigurationProperties.getOrderBy() != null)
-        {
-            String orderBy = baseConfigurationProperties.getOrderBy();
-            //是否包含英文逗号
-            if (orderBy.contains(","))
-            {
-                String[] split = orderBy.split(",");
-                if (split.length == 2)
-                {
-                    String field = split[0];
-                    String order = split[1].toLowerCase(Locale.ROOT);
-                    if ((!order.equals("asc")) && (!order.equals("desc")))
-                    {
-                        log.warn("排序失败！ 逗号后面只能写asc或者desc");
-                    }
-                    else
-                    {
-                        //判断字段是否存在
-                        if (titles.contains(field))
-                        {
-                            //排序
-                            content.sort(new Comparator<Map<String, String>>()
-                            {
-                                @Override
-                                public int compare(Map<String, String> o1, Map<String, String> o2)
-                                {
-                                    String fValue1 = o1.get(field);
-                                    String fValue2 = o2.get(field);
-                                    int result = fValue1.compareTo(fValue2);
-                                    if (order.equals("desc"))
-                                    {
-                                        result = -result;
-                                    }
-                                    return result;
-                                }
-                            });
-                        }
-                        else
-                        {
-                            log.warn("排序字段不存在!");
-                        }
-                    }
-                }
-            }
-            else
-            {
-                log.warn("排序失败！ 不包含逗号");
-            }
-        }
-    }
-
-    /**
-     * 字段去重
-     *
-     * @param titles  表头
-     * @param content 内容
-     * @return {@link List}<{@link Map}<{@link String}, {@link String}>>
-     */
-    private List<Map<String, String>> distinct(List<String> titles, List<Map<String, String>> content)
-    {
-        if (baseConfigurationProperties.getDistinct() != null)
-        {
-            String field = baseConfigurationProperties.getDistinct();
-            Map<String, Map<String, String>> map = new HashMap<>();
-            //判断是否在表头里存在
-            if (titles.contains(field))
-            {
-                //存在
-                for (Map<String, String> stringStringMap : content)
-                {
-                    map.put(stringStringMap.get(field), stringStringMap);
-                }
-                List<Map<String, String>> list = new ArrayList<>();
-                map.forEach(new BiConsumer<String, Map<String, String>>()
-                {
-                    @Override
-                    public void accept(String s, Map<String, String> map)
-                    {
-                        list.add(map);
-                    }
-                });
-                content = list;
-            }
-            else
-            {
-                log.warn("字段去重失败！字段" + field + "不存在");
-            }
-        }
-        return content;
     }
 
     /**

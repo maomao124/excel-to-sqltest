@@ -1,5 +1,6 @@
 package mao.excel_to_sql_test.service.impl;
 
+import mao.excel_to_sql_test.entity.ExcelData;
 import mao.excel_to_sql_test.service.ExcelService;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -50,5 +51,12 @@ class ExcelServiceImplTest
         properties.setProperty("名字", "张三");
         String result = helper.replacePlaceholders("insert into ${tableName} values(${名字});", properties);
         log.debug(result);
+    }
+
+    @Test
+    void saveExcel() throws IOException
+    {
+        ExcelData excelData = excelService.loadExcel();
+        excelService.saveExcel(excelData);
     }
 }

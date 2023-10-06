@@ -3,6 +3,8 @@ package mao.excel_to_sql_test.service.impl;
 import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.dao.SqlDao;
 import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.handler.ExcelDataHandler;
+import mao.excel_to_sql_test.handler.SqlDataHandler;
 import mao.excel_to_sql_test.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -48,6 +51,12 @@ public class RunServiceImpl implements RunService
 
     @Autowired
     private SqlDao sqlDao;
+
+    @Autowired
+    private List<ExcelDataHandler> excelDataHandlerList;
+
+    @Autowired(required = false)
+    private List<SqlDataHandler> sqlDataHandlerList;
 
     @Override
     public void showConfig()
@@ -100,7 +109,7 @@ public class RunServiceImpl implements RunService
     {
         showTip();
         showConfig();
-        ExcelData excelData = excelService.loadExcel();
+        ExcelData excelData = getExcelData();
         if (excelData.getContent().size() > 50 && log.isDebugEnabled())
         {
             showTip();
@@ -138,11 +147,12 @@ public class RunServiceImpl implements RunService
         log.info("任务完成");
     }
 
+
     @Override
     public void run(String template) throws Exception
     {
         showConfig();
-        ExcelData excelData = excelService.loadExcel();
+        ExcelData excelData = getExcelData();
         List<String> sqlList = sqlService.excelToSql(template, excelData);
         fileService.write(sqlList);
         templateService.writeTemplateLog(template);
@@ -156,5 +166,34 @@ public class RunServiceImpl implements RunService
             log.info("跳过执行sql步骤");
         }
         log.info("任务完成");
+    }
+
+    private ExcelData getExcelData() throws IOException
+    {
+        ExcelData excelData = excelService.loadExcel();
+        if (excelDataHandlerList != null)
+        {
+            excelDataHandlerList.sort(new Comparator<ExcelDataHandler>()
+            {
+                @Override
+                public int compare(ExcelDataHandler o1, ExcelDataHandler o2)
+                {
+                    return o1.getOrder() - o2.getOrder();
+                }
+            });
+            StringBuilder str = new StringBuilder("excel数据处理器执行顺序：");
+            for (ExcelDataHandler excelDataHandler : excelDataHandlerList)
+            {
+                str.append("-->").append(excelDataHandler.getName());
+            }
+            log.info(str.toString());
+            for (ExcelDataHandler excelDataHandler : excelDataHandlerList)
+            {
+                log.debug("开始进入 " + excelDataHandler.getName());
+                excelDataHandler.handler(excelData);
+                log.debug("退出 " + excelDataHandler.getName());
+            }
+        }
+        return excelData;
     }
 }
