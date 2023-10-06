@@ -35,6 +35,12 @@ public class OrderByExcelDataHandler implements ExcelDataHandler
     private BaseConfigurationProperties baseConfigurationProperties;
 
     @Override
+    public boolean enabled()
+    {
+        return true;
+    }
+
+    @Override
     public int getOrder()
     {
         return 2;

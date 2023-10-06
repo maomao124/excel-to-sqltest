@@ -52,9 +52,6 @@ public class RunServiceImpl implements RunService
     @Autowired
     private SqlDao sqlDao;
 
-    @Autowired
-    private List<ExcelDataHandler> excelDataHandlerList;
-
     @Autowired(required = false)
     private List<SqlDataHandler> sqlDataHandlerList;
 
@@ -170,30 +167,6 @@ public class RunServiceImpl implements RunService
 
     private ExcelData getExcelData() throws IOException
     {
-        ExcelData excelData = excelService.loadExcel();
-        if (excelDataHandlerList != null)
-        {
-            excelDataHandlerList.sort(new Comparator<ExcelDataHandler>()
-            {
-                @Override
-                public int compare(ExcelDataHandler o1, ExcelDataHandler o2)
-                {
-                    return o1.getOrder() - o2.getOrder();
-                }
-            });
-            StringBuilder str = new StringBuilder("excel数据处理器执行顺序：");
-            for (ExcelDataHandler excelDataHandler : excelDataHandlerList)
-            {
-                str.append("-->").append(excelDataHandler.getName());
-            }
-            log.info(str.toString());
-            for (ExcelDataHandler excelDataHandler : excelDataHandlerList)
-            {
-                log.debug("开始进入 " + excelDataHandler.getName());
-                excelDataHandler.handler(excelData);
-                log.debug("退出 " + excelDataHandler.getName());
-            }
-        }
-        return excelData;
+        return excelService.loadExcel();
     }
 }

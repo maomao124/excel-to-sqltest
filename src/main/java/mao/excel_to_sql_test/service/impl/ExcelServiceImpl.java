@@ -2,6 +2,7 @@ package mao.excel_to_sql_test.service.impl;
 
 import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.handler.ExcelDataHandler;
 import mao.excel_to_sql_test.service.ExcelService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -45,6 +46,9 @@ public class ExcelServiceImpl implements ExcelService
 
     @Autowired
     private BaseConfigurationProperties baseConfigurationProperties;
+
+    @Autowired
+    private List<ExcelDataHandler> excelDataHandlerList;
 
 
     @Override
@@ -146,7 +150,7 @@ public class ExcelServiceImpl implements ExcelService
                 content.add(rowMap);
             }
         }
-        return new ExcelData().setTitles(titles).setContent(content);
+        return executeExcelDataHandler(new ExcelData().setTitles(titles).setContent(content));
     }
 
     @Override
@@ -175,6 +179,7 @@ public class ExcelServiceImpl implements ExcelService
         }
         workbook.write(new FileOutputStream(fileName));
         workbook.close();
+        log.debug("保存的文件位于：" + fileName);
         return true;
     }
 
@@ -208,5 +213,42 @@ public class ExcelServiceImpl implements ExcelService
             }
         });
         return isIgnore.get();
+    }
+
+    /**
+     * 执行excel数据处理器
+     *
+     * @param excelData ExcelData
+     * @return {@link ExcelData} ExcelData
+     * @throws IOException 异常
+     */
+    private ExcelData executeExcelDataHandler(ExcelData excelData) throws IOException
+    {
+        if (excelDataHandlerList != null)
+        {
+            excelDataHandlerList.sort(Comparator.comparingInt(ExcelDataHandler::getOrder));
+            //相当于：
+            /*excelDataHandlerList.sort(new Comparator<ExcelDataHandler>()
+            {
+                @Override
+                public int compare(ExcelDataHandler o1, ExcelDataHandler o2)
+                {
+                    return o1.getOrder() - o2.getOrder();
+                }
+            });*/
+            StringBuilder str = new StringBuilder("excel数据处理器执行顺序：");
+            for (ExcelDataHandler excelDataHandler : excelDataHandlerList)
+            {
+                str.append("-->").append(excelDataHandler.getName());
+            }
+            log.info(str.toString());
+            for (ExcelDataHandler excelDataHandler : excelDataHandlerList)
+            {
+                log.debug("开始进入 " + excelDataHandler.getName());
+                excelDataHandler.handler(excelData);
+                log.debug("退出 " + excelDataHandler.getName());
+            }
+        }
+        return excelData;
     }
 }

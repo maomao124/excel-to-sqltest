@@ -17,6 +17,14 @@ import mao.excel_to_sql_test.entity.ExcelData;
 
 public interface ExcelDataHandler
 {
+
+    /**
+     * 是否启用此处理器
+     *
+     * @return boolean 启用为true，否则为false
+     */
+    boolean enabled();
+
     /**
      * 得到处理器的执行顺序，数字越小，优先级越高
      *

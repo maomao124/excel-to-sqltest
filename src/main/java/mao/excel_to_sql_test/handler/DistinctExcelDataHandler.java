@@ -5,6 +5,7 @@ import mao.excel_to_sql_test.entity.ExcelData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -35,10 +36,28 @@ public class DistinctExcelDataHandler implements ExcelDataHandler
     @Autowired
     private BaseConfigurationProperties baseConfigurationProperties;
 
+    /**
+     * 是否启用此handler，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.distinctExcelDataHandler.enable:true}")
+    private boolean enable;
+
+    /**
+     * 此handler的优先级，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.distinctExcelDataHandler.order:1}")
+    private int order;
+
+    @Override
+    public boolean enabled()
+    {
+        return enable;
+    }
+
     @Override
     public int getOrder()
     {
-        return 1;
+        return order;
     }
 
     @Override

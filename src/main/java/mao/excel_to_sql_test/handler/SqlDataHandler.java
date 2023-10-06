@@ -20,6 +20,13 @@ import java.util.List;
 public interface SqlDataHandler
 {
     /**
+     * 是否启用此处理器
+     *
+     * @return boolean 启用为true，否则为false
+     */
+    boolean enabled();
+
+    /**
      * 得到处理器的执行顺序，数字越小，优先级越高
      *
      * @return int 处理器的执行顺序
