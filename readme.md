@@ -58,7 +58,7 @@ ets:
 mvn package 
 ```
 
-可选择跳过测试
+可选择使用参数`-DskipTests=true`跳过测试
 
 
 生成的文件位于target目录

@@ -32,7 +32,8 @@ class RunServiceImplTest
     @Test
     void run() throws Exception
     {
-        runService.run("update base_put set put_name='${调整后投放点名称}', village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';");
+        runService.run("update base_put set put_name='${调整后投放点名称}', " +
+                "village_name='${调整后小区/村名称}' where put_code='${投放点编号}' and put_name='${投放点名称}';");
     }
 
     /**
@@ -56,7 +57,8 @@ class RunServiceImplTest
                     {
                         try
                         {
-                            runService.run("insert into gameLog values(${FPS},${Time},${FrameTime},${CPU Power [W]},${GPU Power [W]});");
+                            runService.run("insert into gameLog values(${FPS},${Time}," +
+                                    "${FrameTime},${CPU Power [W]},${GPU Power [W]});");
                         }
                         catch (Exception e)
                         {
@@ -85,52 +87,100 @@ class RunServiceImplTest
     @Test
     void run5() throws Exception
     {
-        runService.run("insert into gameLog values(${FPS},${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')},${FrameTime},${(_index?number*2+100000)?c});");
+        runService.run("insert into gameLog values(${FPS}," +
+                "${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}," +
+                "${FrameTime},${(_index?number*2+100000)?c});");
     }
 
     @Test
     void run6() throws Exception
     {
-        runService.run("insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)");
+        runService.run("insert into student values(${年龄}," +
+                "<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)");
     }
 
 
     @Test
     void run7() throws Exception
     {
-        runService.run("INSERT INTO `th_db`.`car_arrange` (`auditing`, `year`, `times`, `type`, `dept_name`, `user_name`, `arrange_date`, `code`, `ptype`, `fnc_type`, `adept_id`, `dept_id`, `memo`, `user_id`, `add_userid`, `add_date`, `modify_userid`, `modify_date`, `tenant_id`, `arrange_type_id`, `car_arrange_id`) VALUES ('0', '${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}', 0, '1', '永宁项目', NULL, NULL, NULL, '0', 'ysc', NULL, 'N000017-100100100001', NULL, NULL, NULL, NULL, NULL, NULL, 'N000017', NULL, 'jx0${(_index?number+348278714144624062142)?c}');");
+        runService.run("INSERT INTO `th_db`.`car_arrange` " +
+                "(`auditing`, `year`, `times`, `type`, `dept_name`, `user_name`, " +
+                "`arrange_date`, `code`, `ptype`, `fnc_type`, `adept_id`, `dept_id`," +
+                " `memo`, `user_id`, `add_userid`, `add_date`, `modify_userid`," +
+                " `modify_date`, `tenant_id`, `arrange_type_id`, `car_arrange_id`)" +
+                " VALUES ('0', '${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}'," +
+                " 0, '1', '永宁项目', NULL, NULL, NULL, '0', 'ysc', NULL," +
+                " 'N000017-100100100001', NULL, NULL, NULL, NULL, NULL, NULL," +
+                " 'N000017', NULL, 'jx0${(_index?number+348278714144624062142)?c}');");
     }
 
     @Test
     void run8() throws Exception
     {
-        runService.run("INSERT INTO `th_db`.`car_arrange_line` (`collector_user_id`, `collector_user_name`, `line_name`, `collector_car_name`, `line_phone`, `add_userid`, `add_date`, `modify_userid`, `modify_date`, `tenant_id`, `collector_car_id`, `car_arrange_id`, `collection_line_id`, `car_arrange_line_id`, `daily_count`, `api_map_id`, `high_speed`, `down_date`, `up_date`, `memo`, `line_time`) VALUES (NULL, '${司机}', NULL, '${车牌号}', '${联系电话?number?c}', NULL, '2023-09-19 00:00:00', NULL, NULL, 'N000017', 'gzepi22091607', (select car_arrange_id FROM car_arrange WHERE year='${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}' AND dept_name='永宁项目'), NULL, 'lzcd00${(_index?number+205)?c}', 0, NULL, NULL, NULL, NULL, '永宁项目', '${收运时间段}');");
+        runService.run("INSERT INTO `th_db`.`car_arrange_line` " +
+                "(`collector_user_id`, `collector_user_name`, `line_name`," +
+                " `collector_car_name`, `line_phone`, `add_userid`, `add_date`, " +
+                "`modify_userid`, `modify_date`, `tenant_id`, `collector_car_id`," +
+                " `car_arrange_id`, `collection_line_id`, `car_arrange_line_id`," +
+                " `daily_count`, `api_map_id`, `high_speed`, `down_date`, " +
+                "`up_date`, `memo`, `line_time`) VALUES (NULL, '${司机}', NULL, " +
+                "'${车牌号}', '${联系电话?number?c}', NULL, '2023-09-19 00:00:00'," +
+                " NULL, NULL, 'N000017', 'gzepi22091607'," +
+                " (select car_arrange_id FROM car_arrange WHERE " +
+                "year='${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}' " +
+                "AND dept_name='永宁项目'), NULL, 'lzcd00${(_index?number+205)?c}', " +
+                "0, NULL, NULL, NULL, NULL, '永宁项目', '${收运时间段}');");
     }
 
     @Test
     void run9() throws Exception
     {
-        runService.run("INSERT INTO `th_db`.`car_arrange` (`auditing`, `year`, `times`, `type`, `dept_name`, `user_name`, `arrange_date`, `code`, `ptype`, `fnc_type`, `adept_id`, `dept_id`, `memo`, `user_id`, `add_userid`, `add_date`, `modify_userid`, `modify_date`, `tenant_id`, `arrange_type_id`, `car_arrange_id`) " +
-                "VALUES ('0', '${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}', 0, '1', '永宁项目', NULL, NULL, NULL, '0', 'ysc', NULL, 'N000017-100100100001', NULL, NULL, NULL, NULL, NULL, NULL, 'N000017', NULL, 'jx0${(_index?number+348278714144624062159)?c}');");
+        runService.run("INSERT INTO `th_db`.`car_arrange` (`auditing`, `year`, `times`, " +
+                "`type`, `dept_name`, `user_name`, `arrange_date`, `code`, `ptype`, `fnc_type`," +
+                " `adept_id`, `dept_id`, `memo`, `user_id`, `add_userid`, `add_date`," +
+                " `modify_userid`, `modify_date`, `tenant_id`, `arrange_type_id`, `car_arrange_id`) " +
+                "VALUES ('0', '${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}', " +
+                "0, '1', '永宁项目', NULL, NULL, NULL, '0', 'ysc', NULL, 'N000017-100100100001', " +
+                "NULL, NULL, NULL, NULL, NULL, NULL, 'N000017', NULL, " +
+                "'jx0${(_index?number+348278714144624062159)?c}');");
     }
 
     @Test
     void run10() throws Exception
     {
-        runService.run("INSERT INTO `th_db`.`car_arrange_line` (`collector_user_id`, `collector_user_name`, `line_name`, `collector_car_name`, `line_phone`, `add_userid`, `add_date`, `modify_userid`, `modify_date`, `tenant_id`, `collector_car_id`, `car_arrange_id`, `collection_line_id`," +
+        runService.run("INSERT INTO `th_db`.`car_arrange_line` (`collector_user_id`, " +
+                "`collector_user_name`, `line_name`, `collector_car_name`, `line_phone`, " +
+                "`add_userid`, `add_date`, `modify_userid`, `modify_date`, `tenant_id`, " +
+                "`collector_car_id`, `car_arrange_id`, `collection_line_id`," +
                 " `car_arrange_line_id`, `daily_count`, `api_map_id`, `high_speed`, `down_date`, `up_date`, " +
                 "`memo`, `line_time`)" +
                 " VALUES (NULL, '${司机}', NULL, '${车牌号}', " +
                 "'${联系电话?number?c}', NULL, '2023-09-19 00:00:00', NULL, NULL, " +
                 "'N000017', 'gzepi22091607', " +
-                "(select car_arrange_id FROM car_arrange WHERE year='${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}' AND dept_name='白云车队')," +
-                " NULL, 'bycd00${(_index?number+205)?c}', 0, NULL, NULL, NULL, NULL, '白云车队·', '${收运时间段}');");
+                "(select car_arrange_id FROM car_arrange WHERE" +
+                " year='${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}' " +
+                "AND dept_name='白云车队')," +
+                " NULL, 'bycd00${(_index?number+205)?c}', 0, NULL, NULL, NULL, NULL," +
+                " '白云车队·', '${收运时间段}');");
     }
 
     @Test
     void run11() throws Exception
     {
-        runService.run("INSERT INTO `th_db`.`car_arrange_line` (`collector_user_id`, `collector_user_name`, `line_name`, `collector_car_name`, `line_phone`, `add_userid`, `add_date`, `modify_userid`, `modify_date`, `tenant_id`, `collector_car_id`, `car_arrange_id`, `collection_line_id`, `car_arrange_line_id`, `daily_count`, `api_map_id`, `high_speed`, `down_date`, `up_date`, `memo`, `line_time`) VALUES (NULL, '${司机}', NULL, '${车牌号}', '${联系电话?number?c}', NULL, '2023-09-19 00:00:00', NULL, NULL, 'N000017', (SELECT dosscard_id FROM car_dosscard WHERE dev_num='${车牌号}' AND dept_name='永宁项目'), (select car_arrange_id FROM car_arrange WHERE year='${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}' AND dept_name='永宁项目'), NULL, 'lzcd00${(_index?number+205)?c}', 0, NULL, NULL, NULL, NULL, '永宁项目', '${收运时间段}');");
+        runService.run("INSERT INTO `th_db`.`car_arrange_line` " +
+                "(`collector_user_id`, `collector_user_name`, `line_name`, " +
+                "`collector_car_name`, `line_phone`, `add_userid`, " +
+                "`add_date`, `modify_userid`, `modify_date`, `tenant_id`, " +
+                "`collector_car_id`, `car_arrange_id`, `collection_line_id`, " +
+                "`car_arrange_line_id`, `daily_count`, `api_map_id`, " +
+                "`high_speed`, `down_date`, `up_date`, `memo`, `line_time`)" +
+                " VALUES (NULL, '${司机}', NULL, '${车牌号}', '${联系电话?number?c}'," +
+                " NULL, '2023-09-19 00:00:00', NULL, NULL, 'N000017', " +
+                "(SELECT dosscard_id FROM car_dosscard WHERE dev_num='${车牌号}'" +
+                " AND dept_name='永宁项目'), (select car_arrange_id FROM car_arrange " +
+                "WHERE year='${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}' " +
+                "AND dept_name='永宁项目'), NULL, 'lzcd00${(_index?number+205)?c}'," +
+                " 0, NULL, NULL, NULL, NULL, '永宁项目', '${收运时间段}');");
     }
 
     /**
@@ -141,7 +191,10 @@ class RunServiceImplTest
     @Test
     void run12() throws Exception
     {
-        runService.run("insert into sys_user (user_id,user_name,id_code,add_date,tenant_id,dept_id,dept_name) values('${(_index?number+2207040178)?c}','${司机}','${身份证号码}','2023-09-21 00:00:00','N000017','N000017-100100090020','雷州项目');");
+        runService.run("insert into sys_user (user_id,user_name,id_code," +
+                "add_date,tenant_id,dept_id,dept_name)" +
+                " values('${(_index?number+2207040178)?c}','${司机}','${身份证号码}'," +
+                "'2023-09-21 00:00:00','N000017','N000017-100100090020','雷州项目');");
     }
 
     /**
@@ -242,5 +295,46 @@ class RunServiceImplTest
         runService.run("" +
                 "update sys_user set duty='${岗位类型}' where user_id='${(_index?number+202210120346)?c}';" +
                 "");
+    }
+
+    /**
+     * 雷州一体化部门人员档案信息更新岗位类型
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run19() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set birth_date=CONCAT(SUBSTR(id_code,7,4)," +
+                "'-',SUBSTR(id_code,11,2),'-',SUBSTR(id_code,13,2))," +
+                "user_type='<#if 岗位类型=='前端保洁工'>sanitation</#if>" +
+                "<#if 岗位类型=='驾驶员'>sj</#if><#if 岗位类型=='司乘'>sc</#if>" +
+                "<#if 岗位类型=='汽车维修工'>check</#if><#if 岗位类型=='勤杂人员'>qinza</#if>" +
+                "<#if 岗位类型=='管理人员'>gl</#if><#if 岗位类型=='其他'>other</#if>" +
+                "<#if 岗位类型=='压缩站操作工'>zzz</#if>'" +
+                " where user_id='${(_index?number+202210120346)?c}';" +
+                "");
+
+    }
+
+
+    /**
+     * 南沙车队收运线路
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run20() throws Exception
+    {
+        runService.run("" +
+                "insert into collection_line (auditing,line_code,line_name,add_date,tenant_id," +
+                "collection_line_id,dept_name,dept_id,line_time,line_phone,collector_user_name," +
+                "collector_car_name,work_type) values ('1','${线路编号}','${线路名称}',NOW()," +
+                "'jxstar','jxstar-${(_index?number+100001)?c}','${管理单位}'," +
+                "(select dept_id from sys_dept where dept_name='${管理单位}'),'${收运时间段}'," +
+                "'${联系电话}','${司机}','${车牌号}','ysc');" +
+                "");
+
     }
 }

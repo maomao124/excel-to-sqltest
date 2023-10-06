@@ -28,4 +28,13 @@ public interface ExcelService
      * @return {@link List}<{@link Map}<{@link String}, {@link String}>>
      */
     ExcelData loadExcel() throws IOException;
+
+    /**
+     * 保存excel数据到文件里
+     *
+     * @param excelData {@link List}<{@link Map}<{@link String}, {@link String}>> 数据
+     * @return boolean 保存成功为true
+     * @throws IOException 异常
+     */
+    boolean saveExcel(ExcelData excelData) throws IOException;
 }

@@ -42,7 +42,7 @@ logging:
 
 
 ets:
-  inputPath: './in5.xlsx'    # excel文件的路径
+  inputPath: './in6.xlsx'    # excel文件的路径
   outputPath: './out.sql'    # sql文件的输出路径
   isWriteToMysql: false      # 是否直接执行输出的sql文件
   wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数

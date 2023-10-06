@@ -8,6 +8,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,20 +52,19 @@ public class ExcelServiceImpl implements ExcelService
     {
         log.debug("文件:" + baseConfigurationProperties.getInputPath());
         int firstRow = baseConfigurationProperties.getExcel().getStartRow();
+        Workbook workbook = null;
         if (baseConfigurationProperties.getInputPath().endsWith(".xls"))
         {
             //加载低版本工作簿
             log.debug("加载低版本excel");
-            Workbook workbook = new HSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
+            workbook = new HSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
         }
         else
         {
             //加载工作簿
             log.debug("加载高版本excel");
-            Workbook workbook = new XSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
+            workbook = new XSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
         }
-        //加载工作簿
-        Workbook workbook = new XSSFWorkbook(new FileInputStream(baseConfigurationProperties.getInputPath()));
         //读取工作表
         Sheet sheet = workbook.getSheetAt(baseConfigurationProperties.getExcel().getSheetAt());
         //得到最后一行
@@ -152,6 +153,35 @@ public class ExcelServiceImpl implements ExcelService
         fieldSort(titles, content);
 
         return new ExcelData().setTitles(titles).setContent(content);
+    }
+
+    @Override
+    public boolean saveExcel(ExcelData excelData) throws IOException
+    {
+        String fileName = "out.xlsx";
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet();
+        //构建表头
+        Row row = sheet.createRow(0);
+        List<String> titles = excelData.getTitles();
+        for (int i = 0; i < titles.size(); i++)
+        {
+            row.createCell(i).setCellValue(titles.get(i));
+        }
+        //内容
+        List<Map<String, String>> content = excelData.getContent();
+        for (int i = 0; i < content.size(); i++)
+        {
+            row = sheet.createRow(i + 1);
+            Map<String, String> rowMap = content.get(i);
+            for (int i1 = 0; i1 < titles.size(); i1++)
+            {
+                row.createCell(i1).setCellValue(rowMap.get(titles.get(i1)));
+            }
+        }
+        workbook.write(new FileOutputStream(fileName));
+        workbook.close();
+        return true;
     }
 
     /**
