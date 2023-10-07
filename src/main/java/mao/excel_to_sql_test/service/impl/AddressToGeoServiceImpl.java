@@ -38,6 +38,11 @@ public class AddressToGeoServiceImpl implements AddressToGeoService
         String url = "https://api.map.baidu.com/geocoding/v3/?address=" + address + "&output=json&ak=" + apiKey;
         String body = HttpRequest.get(url).execute().body();
         JSONObject jsonObject = JSONUtil.parseObj(body);
+        String message = jsonObject.getStr("message");
+        if (message != null)
+        {
+            throw new RuntimeException(message);
+        }
         JSONObject result = jsonObject.getJSONObject("result");
         Double precise = result.getDouble("precise");
         Double confidence = result.getDouble("confidence");

@@ -2,6 +2,8 @@ package mao.excel_to_sql_test.handler;
 
 import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.entity.Geo;
+import mao.excel_to_sql_test.service.AddressToGeoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +32,9 @@ public class AddressToGeoExcelDataHandler implements ExcelDataHandler
 
     private static final Logger log = LoggerFactory.getLogger(DistinctExcelDataHandler.class);
 
+
     @Autowired
-    private BaseConfigurationProperties baseConfigurationProperties;
+    private AddressToGeoService addressToGeoService;
 
     /**
      * 是否启用此handler，从配置文件里读取
@@ -73,7 +76,54 @@ public class AddressToGeoExcelDataHandler implements ExcelDataHandler
     @Override
     public void handler(ExcelData excelData)
     {
-
-
+        if (!excelData.getTitles().contains(filedName))
+        {
+            //没有详细地址字段
+            log.info("没有详细地址字段\"" + filedName + "\"，跳过执行");
+            return;
+        }
+        List<String> titles = excelData.getTitles();
+        List<Map<String, String>> content = excelData.getContent();
+        if (titles.contains("longitude") || titles.contains("latitude"))
+        {
+            log.warn("字段冲突! 已存在字段longitude或者latitude，跳过执行");
+            return;
+        }
+        try
+        {
+            log.info("开始向百度地图服务发起请求");
+            int index = 0;
+            for (Map<String, String> rowMap : content)
+            {
+                String address = rowMap.get(filedName);
+                index++;
+                if (address == null || address.equals(""))
+                {
+                    log.info("跳过" + index);
+                    continue;
+                }
+                //转换
+                Geo geo = addressToGeoService.addressToGeo(address);
+                log.info("已完成：" + index + "/" + rowMap.size() + " ，结果：" + geo);
+                rowMap.put("longitude", geo.getLongitude().toString());
+                rowMap.put("latitude", geo.getLatitude().toString());
+                rowMap.put("precise", geo.getPrecise().toString());
+                rowMap.put("confidence", geo.getConfidence().toString());
+                rowMap.put("comprehension", geo.getComprehension().toString());
+                rowMap.put("level", geo.getLevel());
+            }
+            log.info("请求完成");
+            //设置表头
+            titles.add("longitude");
+            titles.add("latitude");
+            titles.add("precise");
+            titles.add("confidence");
+            titles.add("comprehension");
+            titles.add("level");
+        }
+        catch (Exception e)
+        {
+            log.error("执行详细地址转经纬度excel数据处理器时发生错误：", e);
+        }
     }
 }
