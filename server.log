@@ -238,3 +238,703 @@ ets:
 2023-10-07 11:15:14.604 DEBUG 5964 --- [main] m.e.service.impl.TemplateServiceImpl     : 输出日志：'2023-10-07 11:15:14		./in6.xlsx		insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});'
 2023-10-07 11:15:14.604  INFO 5964 --- [main] m.e.service.impl.RunServiceImpl          : 跳过执行sql步骤
 2023-10-07 11:15:14.604  INFO 5964 --- [main] m.e.service.impl.RunServiceImpl          : 任务完成
+2023-10-07 11:21:47.503  INFO 5124 --- [main] m.e.ExcelToSqltestApplication            : Starting ExcelToSqltestApplication using Java 16.0.2 on mao with PID 5124 (D:\程序\2023Q3\excel-to-sqltest\target\classes started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2023-10-07 11:21:47.504 DEBUG 5124 --- [main] m.e.ExcelToSqltestApplication            : Running with Spring Boot v2.7.1, Spring v5.3.21
+2023-10-07 11:21:47.505  INFO 5124 --- [main] m.e.ExcelToSqltestApplication            : No active profile set, falling back to 1 default profile: "default"
+2023-10-07 11:21:47.686  INFO 5124 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2023-10-07 11:21:47.759  INFO 5124 --- [main] m.e.ExcelToSqltestApplication            : Started ExcelToSqltestApplication in 0.408 seconds (JVM running for 0.637)
+2023-10-07 11:21:47.761  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : 
+
+
+本程序用于将Excel文件里的数据转换成sql脚本，并选择执行!
+通过自定义模板来生成想要的sql语句
+1. 模板使用freemacker模板引擎实现，变量使用'${表头列名称}'格式来替换
+2. freemacker支持加减乘除运算、条件语句、类型转换等，使用方法自行百度
+3. 如果表头包含空格，写法'${.vars['CPU Temp']'
+4. 数值类型会有逗号，可以使用类型转换，示例：'${(_index?number*2+100000)?c}'
+5. 程序包含内置参数'_index'，可以直接使用，从0开始
+6. excel的日期类型统一转换成时间戳，想要格式化的时间，可以写成'${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}'
+7. 对于excel中性别字段为男或女，但是数据库为0或1的，可以使用if else解决，示例：'insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)'
+8. 数据库配置位于 druid.properties 文件里
+9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范
+10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效
+
+ets:
+  inputPath: './in.xlsx'    # excel文件的路径
+  outputPath: './out.sql'    # sql文件的输出路径
+  isWriteToMysql: false      # 是否直接执行输出的sql文件
+  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  distinct: ''               # 要去重的字段
+  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  excel:
+    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
+    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
+    endRow: -1               # 结束行，值为-1默认读到最后一行
+    startCell: 0             # 开始列，默认从第一列开始读
+    endCell: -1              # 结束列，值为-1默认读到最后一列
+  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
+    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
+    "[所属班级]": ['100001']
+
+
+
+2023-10-07 11:21:47.761  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : excel文件位置：./in6.xlsx
+2023-10-07 11:21:47.761  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : sql文件输出位置：./out.sql
+2023-10-07 11:21:47.761  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : 模板日志输出位置：./template.log
+2023-10-07 11:21:47.761  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : SQL之间换行数量：1
+2023-10-07 11:21:47.761  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : 是否写入到数据库：false
+2023-10-07 11:21:47.761  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : Excel配置：Excel[sheetAt=0, startRow=0, endRow=-1, startCell=0, endCell=-1]
+2023-10-07 11:21:47.761  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : 过滤器配置：{所属班级=[100001], 编码=[Noinfo, NotOnly, N000004-446-1151], 联系电话=[]}
+2023-10-07 11:21:47.761 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 文件:./in6.xlsx
+2023-10-07 11:21:47.761 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 加载高版本excel
+2023-10-07 11:21:47.919 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始列：1
+2023-10-07 11:21:47.919 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 结束列：8
+2023-10-07 11:21:47.921 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 表头：[线路编号, 线路名称, 管理单位, 收运时间段, 车牌号, 司机, 联系电话]
+2023-10-07 11:21:47.923 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第2行数据：{收运时间段=5:30:00-18:00:00, 线路编号=33.0, 联系电话=1.3926148987E10, 司机=严洪强, 车牌号=粤AKE089, 管理单位=南沙车队, 线路名称=东涌089线}
+2023-10-07 11:21:47.923 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第3行数据：{收运时间段=5:30:00-18:00:00, 线路编号=34.0, 联系电话=1.3725460467E10, 司机=梁嘉威, 车牌号= 粤AHM202, 管理单位=南沙车队, 线路名称=东涌202线}
+2023-10-07 11:21:47.923 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第4行数据：{收运时间段=5:30:00-18:00:00, 线路编号=35.0, 联系电话=1.5622005499E10, 司机=沈上球, 车牌号=粤AFQ153, 管理单位=南沙车队, 线路名称=东涌153线}
+2023-10-07 11:21:47.923 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第5行数据：{收运时间段=5:30:00-18:00:00, 线路编号=36.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌一站线}
+2023-10-07 11:21:47.924 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第6行数据：{收运时间段=5:30:00-18:00:00, 线路编号=37.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌二站线}
+2023-10-07 11:21:47.924 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第7行数据：{收运时间段=5:30:00-18:00:00, 线路编号=38.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌三站线}
+2023-10-07 11:21:47.924 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第8行数据：{收运时间段=5:30:00-18:00:00, 线路编号=39.0, 联系电话=1.3922361677E10, 司机=何泽文, 车牌号=粤AHK053, 管理单位=南沙车队, 线路名称=东涌餐厨053线}
+2023-10-07 11:21:47.924 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第9行数据：{收运时间段=5:30:00-18:00:00, 线路编号=40.0, 联系电话=1.3719428472E10, 司机=高炳棠, 车牌号=粤AGP738, 管理单位=南沙车队, 线路名称=东涌餐厨738线}
+2023-10-07 11:21:47.924 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 第10行数据：{收运时间段=5:30:00-18:00:00, 线路编号=41.0, 联系电话=13711009292锋13533231181树13672441374安, 司机=莫尔树/俞龙安/钟伟锋, 车牌号=粤ACJ161/粤AGU005/粤AGU080, 管理单位=南沙车队, 线路名称=东涌大件物线}
+2023-10-07 11:21:47.924  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : excel数据处理器执行顺序：-->忽略行excel数据处理器-->字段去重excel数据处理器-->字段排序excel数据处理器-->数据打印excel数据处理器-->保存excel数据处理器
+2023-10-07 11:21:47.924  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"忽略行excel数据处理器"
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"忽略行excel数据处理器"
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段去重excel数据处理器"
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段去重excel数据处理器"
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段排序excel数据处理器"
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段排序excel数据处理器"
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"数据打印excel数据处理器"
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.handler.PrintExcelDataHandler        : 
+
+-----------------------------------------
+| 线路编号	线路名称	管理单位	收运时间段	车牌号	司机	联系电话	
+-----------------------------------------
+| 33.0	东涌089线	南沙车队	5:30:00-18:00:00	粤AKE089	严洪强	1.3926148987E10	
+-----------------------------------------
+| 34.0	东涌202线	南沙车队	5:30:00-18:00:00	 粤AHM202	梁嘉威	1.3725460467E10	
+-----------------------------------------
+| 35.0	东涌153线	南沙车队	5:30:00-18:00:00	粤AFQ153	沈上球	1.5622005499E10	
+-----------------------------------------
+| 36.0	东涌一站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+-----------------------------------------
+| 37.0	东涌二站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+-----------------------------------------
+| 38.0	东涌三站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+-----------------------------------------
+| 39.0	东涌餐厨053线	南沙车队	5:30:00-18:00:00	粤AHK053	何泽文	1.3922361677E10	
+-----------------------------------------
+| 40.0	东涌餐厨738线	南沙车队	5:30:00-18:00:00	粤AGP738	高炳棠	1.3719428472E10	
+-----------------------------------------
+| 41.0	东涌大件物线	南沙车队	5:30:00-18:00:00	粤ACJ161/粤AGU005/粤AGU080	莫尔树/俞龙安/钟伟锋	13711009292锋13533231181树13672441374安	
+-----------------------------------------
+| 
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"数据打印excel数据处理器"
+2023-10-07 11:21:47.925  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"保存excel数据处理器"
+2023-10-07 11:21:47.978 DEBUG 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 保存的文件位于：./out.xlsx
+2023-10-07 11:21:47.979  INFO 5124 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"保存excel数据处理器"
+2023-10-07 11:21:47.979 DEBUG 5124 --- [main] m.e.service.impl.TemplateServiceImpl     : 生成的默认模板：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:21:47.979  INFO 5124 --- [main] m.e.service.impl.RunServiceImpl          : 默认模板示例：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:22:35.358  INFO 6664 --- [main] m.e.ExcelToSqltestApplication            : Starting ExcelToSqltestApplication using Java 16.0.2 on mao with PID 6664 (D:\程序\2023Q3\excel-to-sqltest\target\classes started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2023-10-07 11:22:35.359 DEBUG 6664 --- [main] m.e.ExcelToSqltestApplication            : Running with Spring Boot v2.7.1, Spring v5.3.21
+2023-10-07 11:22:35.359  INFO 6664 --- [main] m.e.ExcelToSqltestApplication            : No active profile set, falling back to 1 default profile: "default"
+2023-10-07 11:22:35.537  INFO 6664 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2023-10-07 11:22:35.607  INFO 6664 --- [main] m.e.ExcelToSqltestApplication            : Started ExcelToSqltestApplication in 0.411 seconds (JVM running for 0.639)
+2023-10-07 11:22:35.609  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : 
+
+
+本程序用于将Excel文件里的数据转换成sql脚本，并选择执行!
+通过自定义模板来生成想要的sql语句
+1. 模板使用freemacker模板引擎实现，变量使用'${表头列名称}'格式来替换
+2. freemacker支持加减乘除运算、条件语句、类型转换等，使用方法自行百度
+3. 如果表头包含空格，写法'${.vars['CPU Temp']'
+4. 数值类型会有逗号，可以使用类型转换，示例：'${(_index?number*2+100000)?c}'
+5. 程序包含内置参数'_index'，可以直接使用，从0开始
+6. excel的日期类型统一转换成时间戳，想要格式化的时间，可以写成'${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}'
+7. 对于excel中性别字段为男或女，但是数据库为0或1的，可以使用if else解决，示例：'insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)'
+8. 数据库配置位于 druid.properties 文件里
+9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范
+10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效
+
+ets:
+  inputPath: './in.xlsx'    # excel文件的路径
+  outputPath: './out.sql'    # sql文件的输出路径
+  isWriteToMysql: false      # 是否直接执行输出的sql文件
+  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  distinct: ''               # 要去重的字段
+  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  excel:
+    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
+    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
+    endRow: -1               # 结束行，值为-1默认读到最后一行
+    startCell: 0             # 开始列，默认从第一列开始读
+    endCell: -1              # 结束列，值为-1默认读到最后一列
+  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
+    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
+    "[所属班级]": ['100001']
+
+
+
+2023-10-07 11:22:35.609  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : excel文件位置：./in6.xlsx
+2023-10-07 11:22:35.609  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : sql文件输出位置：./out.sql
+2023-10-07 11:22:35.609  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : 模板日志输出位置：./template.log
+2023-10-07 11:22:35.609  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : SQL之间换行数量：1
+2023-10-07 11:22:35.609  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : 是否写入到数据库：false
+2023-10-07 11:22:35.609  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : Excel配置：Excel[sheetAt=0, startRow=0, endRow=-1, startCell=0, endCell=-1]
+2023-10-07 11:22:35.609  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : 过滤器配置：{所属班级=[100001], 编码=[Noinfo, NotOnly, N000004-446-1151], 联系电话=[]}
+2023-10-07 11:22:35.609 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 文件:./in6.xlsx
+2023-10-07 11:22:35.609 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 加载高版本excel
+2023-10-07 11:22:35.773 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始列：1
+2023-10-07 11:22:35.773 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 结束列：8
+2023-10-07 11:22:35.775 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 表头：[线路编号, 线路名称, 管理单位, 收运时间段, 车牌号, 司机, 联系电话]
+2023-10-07 11:22:35.777 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第2行数据：{收运时间段=5:30:00-18:00:00, 线路编号=33.0, 联系电话=1.3926148987E10, 司机=严洪强, 车牌号=粤AKE089, 管理单位=南沙车队, 线路名称=东涌089线}
+2023-10-07 11:22:35.778 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第3行数据：{收运时间段=5:30:00-18:00:00, 线路编号=34.0, 联系电话=1.3725460467E10, 司机=梁嘉威, 车牌号= 粤AHM202, 管理单位=南沙车队, 线路名称=东涌202线}
+2023-10-07 11:22:35.778 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第4行数据：{收运时间段=5:30:00-18:00:00, 线路编号=35.0, 联系电话=1.5622005499E10, 司机=沈上球, 车牌号=粤AFQ153, 管理单位=南沙车队, 线路名称=东涌153线}
+2023-10-07 11:22:35.778 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第5行数据：{收运时间段=5:30:00-18:00:00, 线路编号=36.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌一站线}
+2023-10-07 11:22:35.778 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第6行数据：{收运时间段=5:30:00-18:00:00, 线路编号=37.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌二站线}
+2023-10-07 11:22:35.778 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第7行数据：{收运时间段=5:30:00-18:00:00, 线路编号=38.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌三站线}
+2023-10-07 11:22:35.778 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第8行数据：{收运时间段=5:30:00-18:00:00, 线路编号=39.0, 联系电话=1.3922361677E10, 司机=何泽文, 车牌号=粤AHK053, 管理单位=南沙车队, 线路名称=东涌餐厨053线}
+2023-10-07 11:22:35.778 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第9行数据：{收运时间段=5:30:00-18:00:00, 线路编号=40.0, 联系电话=1.3719428472E10, 司机=高炳棠, 车牌号=粤AGP738, 管理单位=南沙车队, 线路名称=东涌餐厨738线}
+2023-10-07 11:22:35.778 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 第10行数据：{收运时间段=5:30:00-18:00:00, 线路编号=41.0, 联系电话=13711009292锋13533231181树13672441374安, 司机=莫尔树/俞龙安/钟伟锋, 车牌号=粤ACJ161/粤AGU005/粤AGU080, 管理单位=南沙车队, 线路名称=东涌大件物线}
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : excel数据处理器执行顺序：-->忽略行excel数据处理器-->字段去重excel数据处理器-->字段排序excel数据处理器-->数据打印excel数据处理器-->保存excel数据处理器
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"忽略行excel数据处理器"
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"忽略行excel数据处理器"
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段去重excel数据处理器"
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段去重excel数据处理器"
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段排序excel数据处理器"
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段排序excel数据处理器"
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"数据打印excel数据处理器"
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.handler.PrintExcelDataHandler        : 
+
+-----------------------------------------
+| 线路编号	线路名称	管理单位	收运时间段	车牌号	司机	联系电话	
+-----------------------------------------
+| 33.0	东涌089线	南沙车队	5:30:00-18:00:00	粤AKE089	严洪强	1.3926148987E10	
+-----------------------------------------
+ 34.0	东涌202线	南沙车队	5:30:00-18:00:00	 粤AHM202	梁嘉威	1.3725460467E10	
+-----------------------------------------
+ 35.0	东涌153线	南沙车队	5:30:00-18:00:00	粤AFQ153	沈上球	1.5622005499E10	
+-----------------------------------------
+ 36.0	东涌一站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+-----------------------------------------
+ 37.0	东涌二站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+-----------------------------------------
+ 38.0	东涌三站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+-----------------------------------------
+ 39.0	东涌餐厨053线	南沙车队	5:30:00-18:00:00	粤AHK053	何泽文	1.3922361677E10	
+-----------------------------------------
+ 40.0	东涌餐厨738线	南沙车队	5:30:00-18:00:00	粤AGP738	高炳棠	1.3719428472E10	
+-----------------------------------------
+ 41.0	东涌大件物线	南沙车队	5:30:00-18:00:00	粤ACJ161/粤AGU005/粤AGU080	莫尔树/俞龙安/钟伟锋	13711009292锋13533231181树13672441374安	
+-----------------------------------------
+ 
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"数据打印excel数据处理器"
+2023-10-07 11:22:35.779  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"保存excel数据处理器"
+2023-10-07 11:22:35.835 DEBUG 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 保存的文件位于：./out.xlsx
+2023-10-07 11:22:35.836  INFO 6664 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"保存excel数据处理器"
+2023-10-07 11:22:35.836 DEBUG 6664 --- [main] m.e.service.impl.TemplateServiceImpl     : 生成的默认模板：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:22:35.836  INFO 6664 --- [main] m.e.service.impl.RunServiceImpl          : 默认模板示例：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:23:15.959  INFO 28236 --- [main] m.e.ExcelToSqltestApplication            : Starting ExcelToSqltestApplication using Java 16.0.2 on mao with PID 28236 (D:\程序\2023Q3\excel-to-sqltest\target\classes started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2023-10-07 11:23:15.960 DEBUG 28236 --- [main] m.e.ExcelToSqltestApplication            : Running with Spring Boot v2.7.1, Spring v5.3.21
+2023-10-07 11:23:15.960  INFO 28236 --- [main] m.e.ExcelToSqltestApplication            : No active profile set, falling back to 1 default profile: "default"
+2023-10-07 11:23:16.145  INFO 28236 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2023-10-07 11:23:16.218  INFO 28236 --- [main] m.e.ExcelToSqltestApplication            : Started ExcelToSqltestApplication in 0.416 seconds (JVM running for 0.639)
+2023-10-07 11:23:16.220  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : 
+
+
+本程序用于将Excel文件里的数据转换成sql脚本，并选择执行!
+通过自定义模板来生成想要的sql语句
+1. 模板使用freemacker模板引擎实现，变量使用'${表头列名称}'格式来替换
+2. freemacker支持加减乘除运算、条件语句、类型转换等，使用方法自行百度
+3. 如果表头包含空格，写法'${.vars['CPU Temp']'
+4. 数值类型会有逗号，可以使用类型转换，示例：'${(_index?number*2+100000)?c}'
+5. 程序包含内置参数'_index'，可以直接使用，从0开始
+6. excel的日期类型统一转换成时间戳，想要格式化的时间，可以写成'${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}'
+7. 对于excel中性别字段为男或女，但是数据库为0或1的，可以使用if else解决，示例：'insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)'
+8. 数据库配置位于 druid.properties 文件里
+9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范
+10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效
+
+ets:
+  inputPath: './in.xlsx'    # excel文件的路径
+  outputPath: './out.sql'    # sql文件的输出路径
+  isWriteToMysql: false      # 是否直接执行输出的sql文件
+  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  distinct: ''               # 要去重的字段
+  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  excel:
+    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
+    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
+    endRow: -1               # 结束行，值为-1默认读到最后一行
+    startCell: 0             # 开始列，默认从第一列开始读
+    endCell: -1              # 结束列，值为-1默认读到最后一列
+  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
+    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
+    "[所属班级]": ['100001']
+
+
+
+2023-10-07 11:23:16.220  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : excel文件位置：./in6.xlsx
+2023-10-07 11:23:16.220  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : sql文件输出位置：./out.sql
+2023-10-07 11:23:16.220  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : 模板日志输出位置：./template.log
+2023-10-07 11:23:16.220  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : SQL之间换行数量：1
+2023-10-07 11:23:16.220  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : 是否写入到数据库：false
+2023-10-07 11:23:16.220  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : Excel配置：Excel[sheetAt=0, startRow=0, endRow=-1, startCell=0, endCell=-1]
+2023-10-07 11:23:16.221  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : 过滤器配置：{所属班级=[100001], 编码=[Noinfo, NotOnly, N000004-446-1151], 联系电话=[]}
+2023-10-07 11:23:16.221 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 文件:./in6.xlsx
+2023-10-07 11:23:16.221 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 加载高版本excel
+2023-10-07 11:23:16.392 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始列：1
+2023-10-07 11:23:16.392 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 结束列：8
+2023-10-07 11:23:16.394 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 表头：[线路编号, 线路名称, 管理单位, 收运时间段, 车牌号, 司机, 联系电话]
+2023-10-07 11:23:16.397 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第2行数据：{收运时间段=5:30:00-18:00:00, 线路编号=33.0, 联系电话=1.3926148987E10, 司机=严洪强, 车牌号=粤AKE089, 管理单位=南沙车队, 线路名称=东涌089线}
+2023-10-07 11:23:16.397 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第3行数据：{收运时间段=5:30:00-18:00:00, 线路编号=34.0, 联系电话=1.3725460467E10, 司机=梁嘉威, 车牌号= 粤AHM202, 管理单位=南沙车队, 线路名称=东涌202线}
+2023-10-07 11:23:16.398 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第4行数据：{收运时间段=5:30:00-18:00:00, 线路编号=35.0, 联系电话=1.5622005499E10, 司机=沈上球, 车牌号=粤AFQ153, 管理单位=南沙车队, 线路名称=东涌153线}
+2023-10-07 11:23:16.398 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第5行数据：{收运时间段=5:30:00-18:00:00, 线路编号=36.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌一站线}
+2023-10-07 11:23:16.398 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第6行数据：{收运时间段=5:30:00-18:00:00, 线路编号=37.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌二站线}
+2023-10-07 11:23:16.398 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第7行数据：{收运时间段=5:30:00-18:00:00, 线路编号=38.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌三站线}
+2023-10-07 11:23:16.398 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第8行数据：{收运时间段=5:30:00-18:00:00, 线路编号=39.0, 联系电话=1.3922361677E10, 司机=何泽文, 车牌号=粤AHK053, 管理单位=南沙车队, 线路名称=东涌餐厨053线}
+2023-10-07 11:23:16.398 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第9行数据：{收运时间段=5:30:00-18:00:00, 线路编号=40.0, 联系电话=1.3719428472E10, 司机=高炳棠, 车牌号=粤AGP738, 管理单位=南沙车队, 线路名称=东涌餐厨738线}
+2023-10-07 11:23:16.398 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 第10行数据：{收运时间段=5:30:00-18:00:00, 线路编号=41.0, 联系电话=13711009292锋13533231181树13672441374安, 司机=莫尔树/俞龙安/钟伟锋, 车牌号=粤ACJ161/粤AGU005/粤AGU080, 管理单位=南沙车队, 线路名称=东涌大件物线}
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : excel数据处理器执行顺序：-->忽略行excel数据处理器-->字段去重excel数据处理器-->字段排序excel数据处理器-->数据打印excel数据处理器-->保存excel数据处理器
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"忽略行excel数据处理器"
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"忽略行excel数据处理器"
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段去重excel数据处理器"
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段去重excel数据处理器"
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段排序excel数据处理器"
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段排序excel数据处理器"
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"数据打印excel数据处理器"
+2023-10-07 11:23:16.399  INFO 28236 --- [main] m.e.handler.PrintExcelDataHandler        : 
+
+-----------------------------------------
+| 线路编号	线路名称	管理单位	收运时间段	车牌号	司机	联系电话	
+-----------------------------------------
+| 33.0	东涌089线	南沙车队	5:30:00-18:00:00	粤AKE089	严洪强	1.3926148987E10	|
+ 34.0	东涌202线	南沙车队	5:30:00-18:00:00	 粤AHM202	梁嘉威	1.3725460467E10	|
+ 35.0	东涌153线	南沙车队	5:30:00-18:00:00	粤AFQ153	沈上球	1.5622005499E10	|
+ 36.0	东涌一站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	|
+ 37.0	东涌二站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	|
+ 38.0	东涌三站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	|
+ 39.0	东涌餐厨053线	南沙车队	5:30:00-18:00:00	粤AHK053	何泽文	1.3922361677E10	|
+ 40.0	东涌餐厨738线	南沙车队	5:30:00-18:00:00	粤AGP738	高炳棠	1.3719428472E10	|
+ 41.0	东涌大件物线	南沙车队	5:30:00-18:00:00	粤ACJ161/粤AGU005/粤AGU080	莫尔树/俞龙安/钟伟锋	13711009292锋13533231181树13672441374安	|
+ 
+2023-10-07 11:23:16.400  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"数据打印excel数据处理器"
+2023-10-07 11:23:16.400  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"保存excel数据处理器"
+2023-10-07 11:23:16.454 DEBUG 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 保存的文件位于：./out.xlsx
+2023-10-07 11:23:16.454  INFO 28236 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"保存excel数据处理器"
+2023-10-07 11:23:16.454 DEBUG 28236 --- [main] m.e.service.impl.TemplateServiceImpl     : 生成的默认模板：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:23:16.454  INFO 28236 --- [main] m.e.service.impl.RunServiceImpl          : 默认模板示例：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:23:48.142  INFO 19336 --- [main] m.e.ExcelToSqltestApplication            : Starting ExcelToSqltestApplication using Java 16.0.2 on mao with PID 19336 (D:\程序\2023Q3\excel-to-sqltest\target\classes started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2023-10-07 11:23:48.143 DEBUG 19336 --- [main] m.e.ExcelToSqltestApplication            : Running with Spring Boot v2.7.1, Spring v5.3.21
+2023-10-07 11:23:48.144  INFO 19336 --- [main] m.e.ExcelToSqltestApplication            : No active profile set, falling back to 1 default profile: "default"
+2023-10-07 11:23:48.343  INFO 19336 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2023-10-07 11:23:48.412  INFO 19336 --- [main] m.e.ExcelToSqltestApplication            : Started ExcelToSqltestApplication in 0.423 seconds (JVM running for 0.648)
+2023-10-07 11:23:48.414  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : 
+
+
+本程序用于将Excel文件里的数据转换成sql脚本，并选择执行!
+通过自定义模板来生成想要的sql语句
+1. 模板使用freemacker模板引擎实现，变量使用'${表头列名称}'格式来替换
+2. freemacker支持加减乘除运算、条件语句、类型转换等，使用方法自行百度
+3. 如果表头包含空格，写法'${.vars['CPU Temp']'
+4. 数值类型会有逗号，可以使用类型转换，示例：'${(_index?number*2+100000)?c}'
+5. 程序包含内置参数'_index'，可以直接使用，从0开始
+6. excel的日期类型统一转换成时间戳，想要格式化的时间，可以写成'${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}'
+7. 对于excel中性别字段为男或女，但是数据库为0或1的，可以使用if else解决，示例：'insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)'
+8. 数据库配置位于 druid.properties 文件里
+9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范
+10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效
+
+ets:
+  inputPath: './in.xlsx'    # excel文件的路径
+  outputPath: './out.sql'    # sql文件的输出路径
+  isWriteToMysql: false      # 是否直接执行输出的sql文件
+  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  distinct: ''               # 要去重的字段
+  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  excel:
+    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
+    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
+    endRow: -1               # 结束行，值为-1默认读到最后一行
+    startCell: 0             # 开始列，默认从第一列开始读
+    endCell: -1              # 结束列，值为-1默认读到最后一列
+  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
+    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
+    "[所属班级]": ['100001']
+
+
+
+2023-10-07 11:23:48.414  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : excel文件位置：./in6.xlsx
+2023-10-07 11:23:48.414  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : sql文件输出位置：./out.sql
+2023-10-07 11:23:48.414  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : 模板日志输出位置：./template.log
+2023-10-07 11:23:48.414  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : SQL之间换行数量：1
+2023-10-07 11:23:48.414  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : 是否写入到数据库：false
+2023-10-07 11:23:48.414  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : Excel配置：Excel[sheetAt=0, startRow=0, endRow=-1, startCell=0, endCell=-1]
+2023-10-07 11:23:48.414  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : 过滤器配置：{所属班级=[100001], 编码=[Noinfo, NotOnly, N000004-446-1151], 联系电话=[]}
+2023-10-07 11:23:48.414 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 文件:./in6.xlsx
+2023-10-07 11:23:48.414 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 加载高版本excel
+2023-10-07 11:23:48.576 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始列：1
+2023-10-07 11:23:48.576 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 结束列：8
+2023-10-07 11:23:48.578 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 表头：[线路编号, 线路名称, 管理单位, 收运时间段, 车牌号, 司机, 联系电话]
+2023-10-07 11:23:48.580 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第2行数据：{收运时间段=5:30:00-18:00:00, 线路编号=33.0, 联系电话=1.3926148987E10, 司机=严洪强, 车牌号=粤AKE089, 管理单位=南沙车队, 线路名称=东涌089线}
+2023-10-07 11:23:48.580 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第3行数据：{收运时间段=5:30:00-18:00:00, 线路编号=34.0, 联系电话=1.3725460467E10, 司机=梁嘉威, 车牌号= 粤AHM202, 管理单位=南沙车队, 线路名称=东涌202线}
+2023-10-07 11:23:48.580 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第4行数据：{收运时间段=5:30:00-18:00:00, 线路编号=35.0, 联系电话=1.5622005499E10, 司机=沈上球, 车牌号=粤AFQ153, 管理单位=南沙车队, 线路名称=东涌153线}
+2023-10-07 11:23:48.580 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第5行数据：{收运时间段=5:30:00-18:00:00, 线路编号=36.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌一站线}
+2023-10-07 11:23:48.580 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第6行数据：{收运时间段=5:30:00-18:00:00, 线路编号=37.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌二站线}
+2023-10-07 11:23:48.581 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第7行数据：{收运时间段=5:30:00-18:00:00, 线路编号=38.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌三站线}
+2023-10-07 11:23:48.581 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第8行数据：{收运时间段=5:30:00-18:00:00, 线路编号=39.0, 联系电话=1.3922361677E10, 司机=何泽文, 车牌号=粤AHK053, 管理单位=南沙车队, 线路名称=东涌餐厨053线}
+2023-10-07 11:23:48.581 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第9行数据：{收运时间段=5:30:00-18:00:00, 线路编号=40.0, 联系电话=1.3719428472E10, 司机=高炳棠, 车牌号=粤AGP738, 管理单位=南沙车队, 线路名称=东涌餐厨738线}
+2023-10-07 11:23:48.581 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 第10行数据：{收运时间段=5:30:00-18:00:00, 线路编号=41.0, 联系电话=13711009292锋13533231181树13672441374安, 司机=莫尔树/俞龙安/钟伟锋, 车牌号=粤ACJ161/粤AGU005/粤AGU080, 管理单位=南沙车队, 线路名称=东涌大件物线}
+2023-10-07 11:23:48.581  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : excel数据处理器执行顺序：-->忽略行excel数据处理器-->字段去重excel数据处理器-->字段排序excel数据处理器-->数据打印excel数据处理器-->保存excel数据处理器
+2023-10-07 11:23:48.581  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"忽略行excel数据处理器"
+2023-10-07 11:23:48.581  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"忽略行excel数据处理器"
+2023-10-07 11:23:48.582  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段去重excel数据处理器"
+2023-10-07 11:23:48.582  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段去重excel数据处理器"
+2023-10-07 11:23:48.582  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段排序excel数据处理器"
+2023-10-07 11:23:48.582  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段排序excel数据处理器"
+2023-10-07 11:23:48.582  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"数据打印excel数据处理器"
+2023-10-07 11:23:48.582  INFO 19336 --- [main] m.e.handler.PrintExcelDataHandler        : 
+
+-----------------------------------------
+| 线路编号	线路名称	管理单位	收运时间段	车牌号	司机	联系电话	
+-----------------------------------------
+| 33.0	东涌089线	南沙车队	5:30:00-18:00:00	粤AKE089	严洪强	1.3926148987E10	
+| 34.0	东涌202线	南沙车队	5:30:00-18:00:00	 粤AHM202	梁嘉威	1.3725460467E10	
+| 35.0	东涌153线	南沙车队	5:30:00-18:00:00	粤AFQ153	沈上球	1.5622005499E10	
+| 36.0	东涌一站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+| 37.0	东涌二站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+| 38.0	东涌三站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+| 39.0	东涌餐厨053线	南沙车队	5:30:00-18:00:00	粤AHK053	何泽文	1.3922361677E10	
+| 40.0	东涌餐厨738线	南沙车队	5:30:00-18:00:00	粤AGP738	高炳棠	1.3719428472E10	
+| 41.0	东涌大件物线	南沙车队	5:30:00-18:00:00	粤ACJ161/粤AGU005/粤AGU080	莫尔树/俞龙安/钟伟锋	13711009292锋13533231181树13672441374安	
+| 
+2023-10-07 11:23:48.582  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"数据打印excel数据处理器"
+2023-10-07 11:23:48.582  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"保存excel数据处理器"
+2023-10-07 11:23:48.637 DEBUG 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 保存的文件位于：./out.xlsx
+2023-10-07 11:23:48.637  INFO 19336 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"保存excel数据处理器"
+2023-10-07 11:23:48.638 DEBUG 19336 --- [main] m.e.service.impl.TemplateServiceImpl     : 生成的默认模板：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:23:48.638  INFO 19336 --- [main] m.e.service.impl.RunServiceImpl          : 默认模板示例：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:24:27.258  INFO 17572 --- [main] m.e.ExcelToSqltestApplication            : Starting ExcelToSqltestApplication using Java 16.0.2 on mao with PID 17572 (D:\程序\2023Q3\excel-to-sqltest\target\classes started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2023-10-07 11:24:27.259 DEBUG 17572 --- [main] m.e.ExcelToSqltestApplication            : Running with Spring Boot v2.7.1, Spring v5.3.21
+2023-10-07 11:24:27.259  INFO 17572 --- [main] m.e.ExcelToSqltestApplication            : No active profile set, falling back to 1 default profile: "default"
+2023-10-07 11:24:27.449  INFO 17572 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2023-10-07 11:24:27.517  INFO 17572 --- [main] m.e.ExcelToSqltestApplication            : Started ExcelToSqltestApplication in 0.415 seconds (JVM running for 0.649)
+2023-10-07 11:24:27.518  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : 
+
+
+本程序用于将Excel文件里的数据转换成sql脚本，并选择执行!
+通过自定义模板来生成想要的sql语句
+1. 模板使用freemacker模板引擎实现，变量使用'${表头列名称}'格式来替换
+2. freemacker支持加减乘除运算、条件语句、类型转换等，使用方法自行百度
+3. 如果表头包含空格，写法'${.vars['CPU Temp']'
+4. 数值类型会有逗号，可以使用类型转换，示例：'${(_index?number*2+100000)?c}'
+5. 程序包含内置参数'_index'，可以直接使用，从0开始
+6. excel的日期类型统一转换成时间戳，想要格式化的时间，可以写成'${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}'
+7. 对于excel中性别字段为男或女，但是数据库为0或1的，可以使用if else解决，示例：'insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)'
+8. 数据库配置位于 druid.properties 文件里
+9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范
+10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效
+
+ets:
+  inputPath: './in.xlsx'    # excel文件的路径
+  outputPath: './out.sql'    # sql文件的输出路径
+  isWriteToMysql: false      # 是否直接执行输出的sql文件
+  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  distinct: ''               # 要去重的字段
+  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  excel:
+    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
+    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
+    endRow: -1               # 结束行，值为-1默认读到最后一行
+    startCell: 0             # 开始列，默认从第一列开始读
+    endCell: -1              # 结束列，值为-1默认读到最后一列
+  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
+    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
+    "[所属班级]": ['100001']
+
+
+
+2023-10-07 11:24:27.519  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : excel文件位置：./in6.xlsx
+2023-10-07 11:24:27.519  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : sql文件输出位置：./out.sql
+2023-10-07 11:24:27.519  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : 模板日志输出位置：./template.log
+2023-10-07 11:24:27.519  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : SQL之间换行数量：1
+2023-10-07 11:24:27.519  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : 是否写入到数据库：false
+2023-10-07 11:24:27.519  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : Excel配置：Excel[sheetAt=0, startRow=0, endRow=-1, startCell=0, endCell=-1]
+2023-10-07 11:24:27.519  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : 过滤器配置：{所属班级=[100001], 编码=[Noinfo, NotOnly, N000004-446-1151], 联系电话=[]}
+2023-10-07 11:24:27.519 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 文件:./in6.xlsx
+2023-10-07 11:24:27.519 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 加载高版本excel
+2023-10-07 11:24:27.683 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始列：1
+2023-10-07 11:24:27.683 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 结束列：8
+2023-10-07 11:24:27.684 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 表头：[线路编号, 线路名称, 管理单位, 收运时间段, 车牌号, 司机, 联系电话]
+2023-10-07 11:24:27.686 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第2行数据：{收运时间段=5:30:00-18:00:00, 线路编号=33.0, 联系电话=1.3926148987E10, 司机=严洪强, 车牌号=粤AKE089, 管理单位=南沙车队, 线路名称=东涌089线}
+2023-10-07 11:24:27.687 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第3行数据：{收运时间段=5:30:00-18:00:00, 线路编号=34.0, 联系电话=1.3725460467E10, 司机=梁嘉威, 车牌号= 粤AHM202, 管理单位=南沙车队, 线路名称=东涌202线}
+2023-10-07 11:24:27.687 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第4行数据：{收运时间段=5:30:00-18:00:00, 线路编号=35.0, 联系电话=1.5622005499E10, 司机=沈上球, 车牌号=粤AFQ153, 管理单位=南沙车队, 线路名称=东涌153线}
+2023-10-07 11:24:27.687 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第5行数据：{收运时间段=5:30:00-18:00:00, 线路编号=36.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌一站线}
+2023-10-07 11:24:27.687 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第6行数据：{收运时间段=5:30:00-18:00:00, 线路编号=37.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌二站线}
+2023-10-07 11:24:27.687 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第7行数据：{收运时间段=5:30:00-18:00:00, 线路编号=38.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌三站线}
+2023-10-07 11:24:27.688 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第8行数据：{收运时间段=5:30:00-18:00:00, 线路编号=39.0, 联系电话=1.3922361677E10, 司机=何泽文, 车牌号=粤AHK053, 管理单位=南沙车队, 线路名称=东涌餐厨053线}
+2023-10-07 11:24:27.688 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第9行数据：{收运时间段=5:30:00-18:00:00, 线路编号=40.0, 联系电话=1.3719428472E10, 司机=高炳棠, 车牌号=粤AGP738, 管理单位=南沙车队, 线路名称=东涌餐厨738线}
+2023-10-07 11:24:27.688 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 第10行数据：{收运时间段=5:30:00-18:00:00, 线路编号=41.0, 联系电话=13711009292锋13533231181树13672441374安, 司机=莫尔树/俞龙安/钟伟锋, 车牌号=粤ACJ161/粤AGU005/粤AGU080, 管理单位=南沙车队, 线路名称=东涌大件物线}
+2023-10-07 11:24:27.688  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : excel数据处理器执行顺序：-->忽略行excel数据处理器-->字段去重excel数据处理器-->字段排序excel数据处理器-->数据打印excel数据处理器-->保存excel数据处理器
+2023-10-07 11:24:27.688  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"忽略行excel数据处理器"
+2023-10-07 11:24:27.688  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"忽略行excel数据处理器"
+2023-10-07 11:24:27.688  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段去重excel数据处理器"
+2023-10-07 11:24:27.688  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段去重excel数据处理器"
+2023-10-07 11:24:27.688  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段排序excel数据处理器"
+2023-10-07 11:24:27.688  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段排序excel数据处理器"
+2023-10-07 11:24:27.689  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"数据打印excel数据处理器"
+2023-10-07 11:24:27.689  INFO 17572 --- [main] m.e.handler.PrintExcelDataHandler        : 
+
+-----------------------------------------
+| 线路编号	线路名称	管理单位	收运时间段	车牌号	司机	联系电话	
+-----------------------------------------
+| 33.0	东涌089线	南沙车队	5:30:00-18:00:00	粤AKE089	严洪强	1.3926148987E10	
+| 34.0	东涌202线	南沙车队	5:30:00-18:00:00	 粤AHM202	梁嘉威	1.3725460467E10	
+| 35.0	东涌153线	南沙车队	5:30:00-18:00:00	粤AFQ153	沈上球	1.5622005499E10	
+| 36.0	东涌一站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+| 37.0	东涌二站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+| 38.0	东涌三站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+| 39.0	东涌餐厨053线	南沙车队	5:30:00-18:00:00	粤AHK053	何泽文	1.3922361677E10	
+| 40.0	东涌餐厨738线	南沙车队	5:30:00-18:00:00	粤AGP738	高炳棠	1.3719428472E10	
+| 41.0	东涌大件物线	南沙车队	5:30:00-18:00:00	粤ACJ161/粤AGU005/粤AGU080	莫尔树/俞龙安/钟伟锋	13711009292锋13533231181树13672441374安	
+| -----------------------------------------
+
+2023-10-07 11:24:27.689  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"数据打印excel数据处理器"
+2023-10-07 11:24:27.689  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"保存excel数据处理器"
+2023-10-07 11:24:27.743 DEBUG 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 保存的文件位于：./out.xlsx
+2023-10-07 11:24:27.743  INFO 17572 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"保存excel数据处理器"
+2023-10-07 11:24:27.743 DEBUG 17572 --- [main] m.e.service.impl.TemplateServiceImpl     : 生成的默认模板：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:24:27.744  INFO 17572 --- [main] m.e.service.impl.RunServiceImpl          : 默认模板示例：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:25:00.267  INFO 9904 --- [main] m.e.ExcelToSqltestApplication            : Starting ExcelToSqltestApplication using Java 16.0.2 on mao with PID 9904 (D:\程序\2023Q3\excel-to-sqltest\target\classes started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2023-10-07 11:25:00.268 DEBUG 9904 --- [main] m.e.ExcelToSqltestApplication            : Running with Spring Boot v2.7.1, Spring v5.3.21
+2023-10-07 11:25:00.268  INFO 9904 --- [main] m.e.ExcelToSqltestApplication            : No active profile set, falling back to 1 default profile: "default"
+2023-10-07 11:25:00.465  INFO 9904 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2023-10-07 11:25:00.534  INFO 9904 --- [main] m.e.ExcelToSqltestApplication            : Started ExcelToSqltestApplication in 0.413 seconds (JVM running for 0.641)
+2023-10-07 11:25:00.536  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : 
+
+
+本程序用于将Excel文件里的数据转换成sql脚本，并选择执行!
+通过自定义模板来生成想要的sql语句
+1. 模板使用freemacker模板引擎实现，变量使用'${表头列名称}'格式来替换
+2. freemacker支持加减乘除运算、条件语句、类型转换等，使用方法自行百度
+3. 如果表头包含空格，写法'${.vars['CPU Temp']'
+4. 数值类型会有逗号，可以使用类型转换，示例：'${(_index?number*2+100000)?c}'
+5. 程序包含内置参数'_index'，可以直接使用，从0开始
+6. excel的日期类型统一转换成时间戳，想要格式化的时间，可以写成'${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}'
+7. 对于excel中性别字段为男或女，但是数据库为0或1的，可以使用if else解决，示例：'insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)'
+8. 数据库配置位于 druid.properties 文件里
+9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范
+10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效
+
+ets:
+  inputPath: './in.xlsx'    # excel文件的路径
+  outputPath: './out.sql'    # sql文件的输出路径
+  isWriteToMysql: false      # 是否直接执行输出的sql文件
+  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  distinct: ''               # 要去重的字段
+  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  excel:
+    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
+    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
+    endRow: -1               # 结束行，值为-1默认读到最后一行
+    startCell: 0             # 开始列，默认从第一列开始读
+    endCell: -1              # 结束列，值为-1默认读到最后一列
+  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
+    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
+    "[所属班级]": ['100001']
+
+
+
+2023-10-07 11:25:00.536  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : excel文件位置：./in6.xlsx
+2023-10-07 11:25:00.536  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : sql文件输出位置：./out.sql
+2023-10-07 11:25:00.536  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : 模板日志输出位置：./template.log
+2023-10-07 11:25:00.536  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : SQL之间换行数量：1
+2023-10-07 11:25:00.536  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : 是否写入到数据库：false
+2023-10-07 11:25:00.536  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : Excel配置：Excel[sheetAt=0, startRow=0, endRow=-1, startCell=0, endCell=-1]
+2023-10-07 11:25:00.536  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : 过滤器配置：{所属班级=[100001], 编码=[Noinfo, NotOnly, N000004-446-1151], 联系电话=[]}
+2023-10-07 11:25:00.536 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 文件:./in6.xlsx
+2023-10-07 11:25:00.536 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 加载高版本excel
+2023-10-07 11:25:00.701 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始列：1
+2023-10-07 11:25:00.701 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 结束列：8
+2023-10-07 11:25:00.702 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 表头：[线路编号, 线路名称, 管理单位, 收运时间段, 车牌号, 司机, 联系电话]
+2023-10-07 11:25:00.705 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第2行数据：{收运时间段=5:30:00-18:00:00, 线路编号=33.0, 联系电话=1.3926148987E10, 司机=严洪强, 车牌号=粤AKE089, 管理单位=南沙车队, 线路名称=东涌089线}
+2023-10-07 11:25:00.705 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第3行数据：{收运时间段=5:30:00-18:00:00, 线路编号=34.0, 联系电话=1.3725460467E10, 司机=梁嘉威, 车牌号= 粤AHM202, 管理单位=南沙车队, 线路名称=东涌202线}
+2023-10-07 11:25:00.705 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第4行数据：{收运时间段=5:30:00-18:00:00, 线路编号=35.0, 联系电话=1.5622005499E10, 司机=沈上球, 车牌号=粤AFQ153, 管理单位=南沙车队, 线路名称=东涌153线}
+2023-10-07 11:25:00.705 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第5行数据：{收运时间段=5:30:00-18:00:00, 线路编号=36.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌一站线}
+2023-10-07 11:25:00.706 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第6行数据：{收运时间段=5:30:00-18:00:00, 线路编号=37.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌二站线}
+2023-10-07 11:25:00.706 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第7行数据：{收运时间段=5:30:00-18:00:00, 线路编号=38.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌三站线}
+2023-10-07 11:25:00.706 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第8行数据：{收运时间段=5:30:00-18:00:00, 线路编号=39.0, 联系电话=1.3922361677E10, 司机=何泽文, 车牌号=粤AHK053, 管理单位=南沙车队, 线路名称=东涌餐厨053线}
+2023-10-07 11:25:00.706 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第9行数据：{收运时间段=5:30:00-18:00:00, 线路编号=40.0, 联系电话=1.3719428472E10, 司机=高炳棠, 车牌号=粤AGP738, 管理单位=南沙车队, 线路名称=东涌餐厨738线}
+2023-10-07 11:25:00.706 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 第10行数据：{收运时间段=5:30:00-18:00:00, 线路编号=41.0, 联系电话=13711009292锋13533231181树13672441374安, 司机=莫尔树/俞龙安/钟伟锋, 车牌号=粤ACJ161/粤AGU005/粤AGU080, 管理单位=南沙车队, 线路名称=东涌大件物线}
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : excel数据处理器执行顺序：-->忽略行excel数据处理器-->字段去重excel数据处理器-->字段排序excel数据处理器-->数据打印excel数据处理器-->保存excel数据处理器
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"忽略行excel数据处理器"
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"忽略行excel数据处理器"
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段去重excel数据处理器"
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段去重excel数据处理器"
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段排序excel数据处理器"
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段排序excel数据处理器"
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"数据打印excel数据处理器"
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.handler.PrintExcelDataHandler        : 
+
+-----------------------------------------
+|  线路编号	线路名称	管理单位	收运时间段	车牌号	司机	联系电话	
+-----------------------------------------
+|  33.0	东涌089线	南沙车队	5:30:00-18:00:00	粤AKE089	严洪强	1.3926148987E10	
+|  34.0	东涌202线	南沙车队	5:30:00-18:00:00	 粤AHM202	梁嘉威	1.3725460467E10	
+|  35.0	东涌153线	南沙车队	5:30:00-18:00:00	粤AFQ153	沈上球	1.5622005499E10	
+|  36.0	东涌一站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+|  37.0	东涌二站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+|  38.0	东涌三站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+|  39.0	东涌餐厨053线	南沙车队	5:30:00-18:00:00	粤AHK053	何泽文	1.3922361677E10	
+|  40.0	东涌餐厨738线	南沙车队	5:30:00-18:00:00	粤AGP738	高炳棠	1.3719428472E10	
+|  41.0	东涌大件物线	南沙车队	5:30:00-18:00:00	粤ACJ161/粤AGU005/粤AGU080	莫尔树/俞龙安/钟伟锋	13711009292锋13533231181树13672441374安	
+|  -----------------------------------------
+
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"数据打印excel数据处理器"
+2023-10-07 11:25:00.707  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"保存excel数据处理器"
+2023-10-07 11:25:00.764 DEBUG 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 保存的文件位于：./out.xlsx
+2023-10-07 11:25:00.765  INFO 9904 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"保存excel数据处理器"
+2023-10-07 11:25:00.765 DEBUG 9904 --- [main] m.e.service.impl.TemplateServiceImpl     : 生成的默认模板：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:25:00.765  INFO 9904 --- [main] m.e.service.impl.RunServiceImpl          : 默认模板示例：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:26:15.377  INFO 42960 --- [main] m.e.ExcelToSqltestApplication            : Starting ExcelToSqltestApplication using Java 16.0.2 on mao with PID 42960 (D:\程序\2023Q3\excel-to-sqltest\target\classes started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2023-10-07 11:26:15.378 DEBUG 42960 --- [main] m.e.ExcelToSqltestApplication            : Running with Spring Boot v2.7.1, Spring v5.3.21
+2023-10-07 11:26:15.379  INFO 42960 --- [main] m.e.ExcelToSqltestApplication            : No active profile set, falling back to 1 default profile: "default"
+2023-10-07 11:26:15.562  INFO 42960 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2023-10-07 11:26:15.633  INFO 42960 --- [main] m.e.ExcelToSqltestApplication            : Started ExcelToSqltestApplication in 0.416 seconds (JVM running for 0.644)
+2023-10-07 11:26:15.634  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : 
+
+
+本程序用于将Excel文件里的数据转换成sql脚本，并选择执行!
+通过自定义模板来生成想要的sql语句
+1. 模板使用freemacker模板引擎实现，变量使用'${表头列名称}'格式来替换
+2. freemacker支持加减乘除运算、条件语句、类型转换等，使用方法自行百度
+3. 如果表头包含空格，写法'${.vars['CPU Temp']'
+4. 数值类型会有逗号，可以使用类型转换，示例：'${(_index?number*2+100000)?c}'
+5. 程序包含内置参数'_index'，可以直接使用，从0开始
+6. excel的日期类型统一转换成时间戳，想要格式化的时间，可以写成'${Time?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}'
+7. 对于excel中性别字段为男或女，但是数据库为0或1的，可以使用if else解决，示例：'insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)'
+8. 数据库配置位于 druid.properties 文件里
+9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范
+10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效
+
+ets:
+  inputPath: './in.xlsx'    # excel文件的路径
+  outputPath: './out.sql'    # sql文件的输出路径
+  isWriteToMysql: false      # 是否直接执行输出的sql文件
+  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  distinct: ''               # 要去重的字段
+  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  excel:
+    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
+    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
+    endRow: -1               # 结束行，值为-1默认读到最后一行
+    startCell: 0             # 开始列，默认从第一列开始读
+    endCell: -1              # 结束列，值为-1默认读到最后一列
+  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
+    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
+    "[所属班级]": ['100001']
+
+
+
+2023-10-07 11:26:15.634  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : excel文件位置：./in6.xlsx
+2023-10-07 11:26:15.635  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : sql文件输出位置：./out.sql
+2023-10-07 11:26:15.635  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : 模板日志输出位置：./template.log
+2023-10-07 11:26:15.635  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : SQL之间换行数量：1
+2023-10-07 11:26:15.635  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : 是否写入到数据库：false
+2023-10-07 11:26:15.635  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : Excel配置：Excel[sheetAt=0, startRow=0, endRow=-1, startCell=0, endCell=-1]
+2023-10-07 11:26:15.635  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : 过滤器配置：{所属班级=[100001], 编码=[Noinfo, NotOnly, N000004-446-1151], 联系电话=[]}
+2023-10-07 11:26:15.635 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 文件:./in6.xlsx
+2023-10-07 11:26:15.635 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 加载高版本excel
+2023-10-07 11:26:15.805 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始列：1
+2023-10-07 11:26:15.805 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 结束列：8
+2023-10-07 11:26:15.807 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 表头：[线路编号, 线路名称, 管理单位, 收运时间段, 车牌号, 司机, 联系电话]
+2023-10-07 11:26:15.810 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第2行数据：{收运时间段=5:30:00-18:00:00, 线路编号=33.0, 联系电话=1.3926148987E10, 司机=严洪强, 车牌号=粤AKE089, 管理单位=南沙车队, 线路名称=东涌089线}
+2023-10-07 11:26:15.810 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第3行数据：{收运时间段=5:30:00-18:00:00, 线路编号=34.0, 联系电话=1.3725460467E10, 司机=梁嘉威, 车牌号= 粤AHM202, 管理单位=南沙车队, 线路名称=东涌202线}
+2023-10-07 11:26:15.810 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第4行数据：{收运时间段=5:30:00-18:00:00, 线路编号=35.0, 联系电话=1.5622005499E10, 司机=沈上球, 车牌号=粤AFQ153, 管理单位=南沙车队, 线路名称=东涌153线}
+2023-10-07 11:26:15.810 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第5行数据：{收运时间段=5:30:00-18:00:00, 线路编号=36.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌一站线}
+2023-10-07 11:26:15.810 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第6行数据：{收运时间段=5:30:00-18:00:00, 线路编号=37.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌二站线}
+2023-10-07 11:26:15.811 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第7行数据：{收运时间段=5:30:00-18:00:00, 线路编号=38.0, 联系电话=13710300102烽13711028830荣15876522067有13434186232光15889933205周, 司机=梁永烽/郭志荣/郭桂有/李承周/梁铭光, 车牌号=粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683, 管理单位=南沙车队, 线路名称=东涌三站线}
+2023-10-07 11:26:15.811 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第8行数据：{收运时间段=5:30:00-18:00:00, 线路编号=39.0, 联系电话=1.3922361677E10, 司机=何泽文, 车牌号=粤AHK053, 管理单位=南沙车队, 线路名称=东涌餐厨053线}
+2023-10-07 11:26:15.811 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第9行数据：{收运时间段=5:30:00-18:00:00, 线路编号=40.0, 联系电话=1.3719428472E10, 司机=高炳棠, 车牌号=粤AGP738, 管理单位=南沙车队, 线路名称=东涌餐厨738线}
+2023-10-07 11:26:15.811 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 第10行数据：{收运时间段=5:30:00-18:00:00, 线路编号=41.0, 联系电话=13711009292锋13533231181树13672441374安, 司机=莫尔树/俞龙安/钟伟锋, 车牌号=粤ACJ161/粤AGU005/粤AGU080, 管理单位=南沙车队, 线路名称=东涌大件物线}
+2023-10-07 11:26:15.811  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : excel数据处理器执行顺序：-->忽略行excel数据处理器-->字段去重excel数据处理器-->字段排序excel数据处理器-->数据打印excel数据处理器-->保存excel数据处理器
+2023-10-07 11:26:15.811  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"忽略行excel数据处理器"
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"忽略行excel数据处理器"
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段去重excel数据处理器"
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段去重excel数据处理器"
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"字段排序excel数据处理器"
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"字段排序excel数据处理器"
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"数据打印excel数据处理器"
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.handler.PrintExcelDataHandler        : 
+
+-----------------------------------------------------------------------
+|  线路编号	线路名称	管理单位	收运时间段	车牌号	司机	联系电话	
+-----------------------------------------------------------------------
+|  33.0	东涌089线	南沙车队	5:30:00-18:00:00	粤AKE089	严洪强	1.3926148987E10	
+|  34.0	东涌202线	南沙车队	5:30:00-18:00:00	 粤AHM202	梁嘉威	1.3725460467E10	
+|  35.0	东涌153线	南沙车队	5:30:00-18:00:00	粤AFQ153	沈上球	1.5622005499E10	
+|  36.0	东涌一站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+|  37.0	东涌二站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+|  38.0	东涌三站线	南沙车队	5:30:00-18:00:00	粤AGQ282/粤AFG223/粤AHF907/粤AGA700/粤AGK683	梁永烽/郭志荣/郭桂有/李承周/梁铭光	13710300102烽13711028830荣15876522067有13434186232光15889933205周	
+|  39.0	东涌餐厨053线	南沙车队	5:30:00-18:00:00	粤AHK053	何泽文	1.3922361677E10	
+|  40.0	东涌餐厨738线	南沙车队	5:30:00-18:00:00	粤AGP738	高炳棠	1.3719428472E10	
+|  41.0	东涌大件物线	南沙车队	5:30:00-18:00:00	粤ACJ161/粤AGU005/粤AGU080	莫尔树/俞龙安/钟伟锋	13711009292锋13533231181树13672441374安	
+|  -----------------------------------------------------------------------
+
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"数据打印excel数据处理器"
+2023-10-07 11:26:15.812  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 开始进入"保存excel数据处理器"
+2023-10-07 11:26:15.870 DEBUG 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 保存的文件位于：./out.xlsx
+2023-10-07 11:26:15.870  INFO 42960 --- [main] m.e.service.impl.ExcelServiceImpl        : 退出"保存excel数据处理器"
+2023-10-07 11:26:15.870 DEBUG 42960 --- [main] m.e.service.impl.TemplateServiceImpl     : 生成的默认模板：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:26:15.870  INFO 42960 --- [main] m.e.service.impl.RunServiceImpl          : 默认模板示例：insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 12:24:34.222  INFO 2792 --- [main] m.e.ExcelToSqltestApplication            : Starting ExcelToSqltestApplication using Java 16.0.2 on mao with PID 2792 (D:\程序\2023Q3\excel-to-sqltest\target\classes started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2023-10-07 12:24:34.224 DEBUG 2792 --- [main] m.e.ExcelToSqltestApplication            : Running with Spring Boot v2.7.1, Spring v5.3.21
+2023-10-07 12:24:34.224  INFO 2792 --- [main] m.e.ExcelToSqltestApplication            : No active profile set, falling back to 1 default profile: "default"
+2023-10-07 12:24:34.499  INFO 2792 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2023-10-07 12:24:34.504  WARN 2792 --- [main] s.c.a.AnnotationConfigApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'addressToGeoExcelDataHandler': Unsatisfied dependency expressed through field 'filedName'; nested exception is org.springframework.beans.TypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'int'; nested exception is java.lang.NumberFormatException: For input string: "address"
+2023-10-07 12:24:34.508  INFO 2792 --- [main] ConditionEvaluationReportLoggingListener : 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+2023-10-07 12:24:34.516 ERROR 2792 --- [main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'addressToGeoExcelDataHandler': Unsatisfied dependency expressed through field 'filedName'; nested exception is org.springframework.beans.TypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'int'; nested exception is java.lang.NumberFormatException: For input string: "address"
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:659) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.inject(AutowiredAnnotationBeanPostProcessor.java:639) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.annotation.InjectionMetadata.inject(InjectionMetadata.java:119) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor.postProcessProperties(AutowiredAnnotationBeanPostProcessor.java:399) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.populateBean(AbstractAutowireCapableBeanFactory.java:1431) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:619) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:208) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:955) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:918) ~[spring-context-5.3.21.jar:5.3.21]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:583) ~[spring-context-5.3.21.jar:5.3.21]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:734) ~[spring-boot-2.7.1.jar:2.7.1]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:408) ~[spring-boot-2.7.1.jar:2.7.1]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:308) ~[spring-boot-2.7.1.jar:2.7.1]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1306) ~[spring-boot-2.7.1.jar:2.7.1]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1295) ~[spring-boot-2.7.1.jar:2.7.1]
+	at mao.excel_to_sql_test.ExcelToSqltestApplication.main(ExcelToSqltestApplication.java:14) ~[classes/:na]
+Caused by: org.springframework.beans.TypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'int'; nested exception is java.lang.NumberFormatException: For input string: "address"
+	at org.springframework.beans.TypeConverterSupport.convertIfNecessary(TypeConverterSupport.java:79) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1339) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1311) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor$AutowiredFieldElement.resolveFieldValue(AutowiredAnnotationBeanPostProcessor.java:656) ~[spring-beans-5.3.21.jar:5.3.21]
+	... 19 common frames omitted
+Caused by: java.lang.NumberFormatException: For input string: "address"
+	at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67) ~[na:na]
+	at java.base/java.lang.Integer.parseInt(Integer.java:660) ~[na:na]
+	at java.base/java.lang.Integer.valueOf(Integer.java:991) ~[na:na]
+	at org.springframework.util.NumberUtils.parseNumber(NumberUtils.java:211) ~[spring-core-5.3.21.jar:5.3.21]
+	at org.springframework.beans.propertyeditors.CustomNumberEditor.setAsText(CustomNumberEditor.java:115) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.TypeConverterDelegate.doConvertTextValue(TypeConverterDelegate.java:429) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.TypeConverterDelegate.doConvertValue(TypeConverterDelegate.java:402) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.TypeConverterDelegate.convertIfNecessary(TypeConverterDelegate.java:155) ~[spring-beans-5.3.21.jar:5.3.21]
+	at org.springframework.beans.TypeConverterSupport.convertIfNecessary(TypeConverterSupport.java:73) ~[spring-beans-5.3.21.jar:5.3.21]
+	... 22 common frames omitted
+

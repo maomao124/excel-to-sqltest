@@ -88,6 +88,11 @@ public class BaseConfigurationProperties
     private Map<String, List<String>> filter = new HashMap<>();
 
     /**
+     * 百度地图apikey
+     */
+    private String apiKey;
+
+    /**
      * excel配置
      */
     private Excel excel = new Excel();
@@ -211,6 +216,17 @@ public class BaseConfigurationProperties
     public BaseConfigurationProperties setAppendTimeFormat(String appendTimeFormat)
     {
         this.appendTimeFormat = appendTimeFormat;
+        return this;
+    }
+
+    public String getApiKey()
+    {
+        return apiKey;
+    }
+
+    public BaseConfigurationProperties setApiKey(String apiKey)
+    {
+        this.apiKey = apiKey;
         return this;
     }
 }

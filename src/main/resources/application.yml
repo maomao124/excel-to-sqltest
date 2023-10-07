@@ -47,6 +47,7 @@ ets:
   appendTimeFormat: 'YYYYMMddHHmmss'   # 输出文件的文件名的后面追加时间信息的格式
   isWriteToMysql: false      # 是否直接执行输出的sql文件
   wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  apiKey: ''
   #distinct: ''               # 要去重的字段
   #orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
   excel:

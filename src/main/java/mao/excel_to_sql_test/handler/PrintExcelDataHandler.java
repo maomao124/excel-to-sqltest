@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * Project name(项目名称)：excel-to-sqltest
  * Package(包名): mao.excel_to_sql_test.handler
@@ -58,6 +61,24 @@ public class PrintExcelDataHandler implements ExcelDataHandler
     @Override
     public void handler(ExcelData excelData)
     {
-
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String> titles = excelData.getTitles();
+        List<Map<String, String>> content = excelData.getContent();
+        stringBuilder.append("\n\n-----------------------------------------------------------------------\n|  ");
+        for (String title : titles)
+        {
+            stringBuilder.append(title).append("\t");
+        }
+        stringBuilder.append("\n-----------------------------------------------------------------------\n|  ");
+        for (Map<String, String> rowMap : content)
+        {
+            for (String title : titles)
+            {
+                stringBuilder.append(rowMap.get(title)).append("\t");
+            }
+            stringBuilder.append("\n|  ");
+        }
+        stringBuilder.append("-----------------------------------------------------------------------\n");
+        log.info(stringBuilder.toString());
     }
 }
