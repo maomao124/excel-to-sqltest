@@ -62,5 +62,14 @@ ets:
       distinctExcelDataHandler:
         enable: true
         order: 1
+      orderByExcelDataHandler:
+        enable: true
+        order: 2
+      printExcelDataHandler:
+        enable: true
+        order: 9998
+      saveExcelDataHandler:
+        enable: true
+        order: 9999
 
 

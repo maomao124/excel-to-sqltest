@@ -1,6 +1,9 @@
 package mao.excel_to_sql_test.handler;
 
 import mao.excel_to_sql_test.entity.ExcelData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -20,16 +23,30 @@ import org.springframework.stereotype.Component;
 public class PrintExcelDataHandler implements ExcelDataHandler
 {
 
+    private static final Logger log = LoggerFactory.getLogger(PrintExcelDataHandler.class);
+
+    /**
+     * 是否启用此handler，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.printExcelDataHandler.enable:true}")
+    private boolean enable;
+
+    /**
+     * 此handler的优先级，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.printExcelDataHandler.order:9998}")
+    private int order;
+
     @Override
     public boolean enabled()
     {
-        return true;
+        return enable;
     }
 
     @Override
     public int getOrder()
     {
-        return 9998;
+        return order;
     }
 
     @Override

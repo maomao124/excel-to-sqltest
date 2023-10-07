@@ -5,6 +5,7 @@ import mao.excel_to_sql_test.entity.ExcelData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Comparator;
@@ -34,16 +35,28 @@ public class OrderByExcelDataHandler implements ExcelDataHandler
     @Autowired
     private BaseConfigurationProperties baseConfigurationProperties;
 
+    /**
+     * 是否启用此handler，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.orderByExcelDataHandler.enable:true}")
+    private boolean enable;
+
+    /**
+     * 此handler的优先级，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.orderByExcelDataHandler.order:2}")
+    private int order;
+
     @Override
     public boolean enabled()
     {
-        return true;
+        return enable;
     }
 
     @Override
     public int getOrder()
     {
-        return 2;
+        return order;
     }
 
     @Override

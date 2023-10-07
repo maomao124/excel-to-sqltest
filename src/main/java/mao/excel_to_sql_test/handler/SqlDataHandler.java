@@ -44,7 +44,8 @@ public interface SqlDataHandler
      * 处理数据
      *
      * @param excelData excel数据，在这里修改几乎无意义，供查询使用
+     * @param template  模板
      * @param sqlList   sql列表
      */
-    void handler(ExcelData excelData, List<String> sqlList);
+    void handler(ExcelData excelData, String template, List<String> sqlList);
 }

@@ -5,6 +5,7 @@ import mao.excel_to_sql_test.service.ExcelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,18 @@ public class SaveExcelDataHandler implements ExcelDataHandler
 {
     private static final Logger log = LoggerFactory.getLogger(SaveExcelDataHandler.class);
 
+    /**
+     * 是否启用此handler，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.saveExcelDataHandler.enable:true}")
+    private boolean enable;
+
+    /**
+     * 此handler的优先级，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.saveExcelDataHandler.order:9999}")
+    private int order;
+
     @Lazy
     @Autowired
     private ExcelService excelService;
@@ -35,13 +48,13 @@ public class SaveExcelDataHandler implements ExcelDataHandler
     @Override
     public boolean enabled()
     {
-        return true;
+        return enable;
     }
 
     @Override
     public int getOrder()
     {
-        return 9999;
+        return order;
     }
 
     @Override

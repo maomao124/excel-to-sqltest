@@ -239,14 +239,23 @@ public class ExcelServiceImpl implements ExcelService
             StringBuilder str = new StringBuilder("excel数据处理器执行顺序：");
             for (ExcelDataHandler excelDataHandler : excelDataHandlerList)
             {
+                if (!excelDataHandler.enabled())
+                {
+                    continue;
+                }
                 str.append("-->").append(excelDataHandler.getName());
             }
             log.info(str.toString());
             for (ExcelDataHandler excelDataHandler : excelDataHandlerList)
             {
-                log.debug("开始进入 " + excelDataHandler.getName());
+                if (!excelDataHandler.enabled())
+                {
+                    log.info("excel数据处理器\"" + excelDataHandler.getName() + "\"已关闭");
+                    continue;
+                }
+                log.info("开始进入\"" + excelDataHandler.getName() + "\"");
                 excelDataHandler.handler(excelData);
-                log.debug("退出 " + excelDataHandler.getName());
+                log.info("退出\"" + excelDataHandler.getName() + "\"");
             }
         }
         return excelData;
