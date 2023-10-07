@@ -43,6 +43,8 @@ logging:
 ets:
   inputPath: './in6.xlsx'    # excel文件的路径
   outputPath: './out.sql'    # sql文件的输出路径
+  appendTime: false          # 输出文件的文件名的后面是否追加时间信息
+  appendTimeFormat: 'YYYYMMddHHmmss'   # 输出文件的文件名的后面追加时间信息的格式
   isWriteToMysql: false      # 是否直接执行输出的sql文件
   wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
   #distinct: ''               # 要去重的字段
@@ -57,18 +59,21 @@ ets:
     "[编码]": [ 'Noinfo','NotOnly','N000004-446-1151' ]
     "[所属班级]": [ '100001' ]
     "[联系电话]": [ '' ]
-  handler:
-    excelDataHandler:
-      distinctExcelDataHandler:
+  handler:                   # 处理器
+    excelDataHandler:        # excel数据处理器
+      ignoreRowExcelDataHandler:  # 忽略行excel数据处理器，filter为此处理器的配置项
+        enable: true              # 是否启用此处理器
+        order: 0                  # 执行的优先级，数字越低，优先级越高，越先执行
+      distinctExcelDataHandler:   # 字段去重excel数据处理器，distinct为此处理器的配置项
         enable: true
         order: 1
-      orderByExcelDataHandler:
+      orderByExcelDataHandler:    # 字段排序excel数据处理器，orderBy为此处理器的配置项
         enable: true
         order: 2
-      printExcelDataHandler:
+      printExcelDataHandler:      # 数据打印excel数据处理器
         enable: true
         order: 9998
-      saveExcelDataHandler:
+      saveExcelDataHandler:       # 保存excel数据处理器
         enable: true
         order: 9999
 

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
@@ -139,16 +140,8 @@ public class ExcelServiceImpl implements ExcelService
                 }
                 rowMap.put(iterator.next(), value);
             }
-            if (isIgnore(rowMap))
-            {
-                //忽略
-                log.info("忽略第" + (i + 1) + "行数据：" + rowMap);
-            }
-            else
-            {
-                log.debug("第" + (i + 1) + "行数据：" + rowMap);
-                content.add(rowMap);
-            }
+            log.debug("第" + (i + 1) + "行数据：" + rowMap);
+            content.add(rowMap);
         }
         return executeExcelDataHandler(new ExcelData().setTitles(titles).setContent(content));
     }
@@ -156,7 +149,22 @@ public class ExcelServiceImpl implements ExcelService
     @Override
     public boolean saveExcel(ExcelData excelData) throws IOException
     {
-        String fileName = "out.xlsx";
+        String path = baseConfigurationProperties.getOutputPath();
+
+        boolean appendTime = baseConfigurationProperties.isAppendTime();
+        String appendTimeFormat = baseConfigurationProperties.getAppendTimeFormat();
+        int index = path.lastIndexOf(".");
+        String startSubstring = path.substring(0, index);
+        if (appendTime)
+        {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(appendTimeFormat);
+            String format = simpleDateFormat.format(new Date());
+            path = startSubstring + "-" + format + ".xlsx";
+        }
+        else
+        {
+            path = startSubstring + ".xlsx";
+        }
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet();
         //构建表头
@@ -177,43 +185,12 @@ public class ExcelServiceImpl implements ExcelService
                 row.createCell(i1).setCellValue(rowMap.get(titles.get(i1)));
             }
         }
-        workbook.write(new FileOutputStream(fileName));
+        workbook.write(new FileOutputStream(path));
         workbook.close();
-        log.debug("保存的文件位于：" + fileName);
+        log.debug("保存的文件位于：" + path);
         return true;
     }
 
-    /**
-     * 是否忽略当前行
-     *
-     * @param rowMap 行数据
-     * @return boolean 要忽略为是
-     */
-    private boolean isIgnore(Map<String, String> rowMap)
-    {
-        Map<String, List<String>> filter = baseConfigurationProperties.getFilter();
-        AtomicBoolean isIgnore = new AtomicBoolean(false);
-        rowMap.forEach((title, value) ->
-        {
-            //判断该列的表头是否在过滤列表里
-            if (filter.get(title) == null)
-            {
-                //不在过滤列表，直接下一个
-                return;
-            }
-            //表头在过滤列表里
-            List<String> list = filter.get(title);
-            for (String s : list)
-            {
-                if (s.equals(value))
-                {
-                    isIgnore.set(true);
-                    return;
-                }
-            }
-        });
-        return isIgnore.get();
-    }
 
     /**
      * 执行excel数据处理器

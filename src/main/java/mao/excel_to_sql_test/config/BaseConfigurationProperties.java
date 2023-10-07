@@ -39,6 +39,16 @@ public class BaseConfigurationProperties
     private String templateLogPath = "./template.log";
 
     /**
+     * 输出文件的文件名的后面是否追加时间信息
+     */
+    private boolean appendTime = false;
+
+    /**
+     * 输出文件的文件名的后面追加时间信息的格式
+     */
+    private String appendTimeFormat = "YYYYMMddHHmmss";
+
+    /**
      * 是否生成文件后，还要将数据更新到mysql数据库里（执行sql语句）
      */
     private boolean isWriteToMysql = false;
@@ -179,6 +189,28 @@ public class BaseConfigurationProperties
     public BaseConfigurationProperties setOrderBy(String orderBy)
     {
         this.orderBy = orderBy;
+        return this;
+    }
+
+    public boolean isAppendTime()
+    {
+        return appendTime;
+    }
+
+    public BaseConfigurationProperties setAppendTime(boolean appendTime)
+    {
+        this.appendTime = appendTime;
+        return this;
+    }
+
+    public String getAppendTimeFormat()
+    {
+        return appendTimeFormat;
+    }
+
+    public BaseConfigurationProperties setAppendTimeFormat(String appendTimeFormat)
+    {
+        this.appendTimeFormat = appendTimeFormat;
         return this;
     }
 }

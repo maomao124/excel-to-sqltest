@@ -3799,3 +3799,10 @@
 2023-09-26 10:04:02		./in6.xlsx		insert into collection_line (auditing,line_code,line_name,add_date,tenant_id,collection_line_id,dept_name,dept_id,line_time,line_phone,collector_user_name,collector_car_name,work_type) values ('1','${线路编号}','${线路名称}',NOW(),'jxstar','jxstar-${_index?number+1000001}','${管理单位}',(select dept_id from sys_dept where dept_name='${管理单位}'),'${收运时间段}','${联系电话}','${司机}','${车牌号}','ysc');
 2023-09-26 10:06:40		./in6.xlsx		insert into collection_line (auditing,line_code,line_name,add_date,tenant_id,collection_line_id,dept_name,dept_id,line_time,line_phone,collector_user_name,collector_car_name,work_type) values ('1','${线路编号}','${线路名称}',NOW(),'jxstar','jxstar-${_index?number?c+1000001}','${管理单位}',(select dept_id from sys_dept where dept_name='${管理单位}'),'${收运时间段}','${联系电话}','${司机}','${车牌号}','ysc');
 2023-09-26 10:08:20		./in6.xlsx		insert into collection_line (auditing,line_code,line_name,add_date,tenant_id,collection_line_id,dept_name,dept_id,line_time,line_phone,collector_user_name,collector_car_name,work_type) values ('1','${线路编号}','${线路名称}',NOW(),'jxstar','jxstar-${(_index?number+100001)?c}','${管理单位}',(select dept_id from sys_dept where dept_name='${管理单位}'),'${收运时间段}','${联系电话}','${司机}','${车牌号}','ysc');
+2023-10-07 10:17:39		./in6.xlsx		a
+2023-10-07 11:03:58		./in6.xlsx		insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:05:01		./in6.xlsx		insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:12:17		./in6.xlsx		insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:12:51		./in6.xlsx		insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:14:15		./in6.xlsx		insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});
+2023-10-07 11:15:14		./in6.xlsx		insert into 表名 (线路编号,线路名称,管理单位,收运时间段,车牌号,司机,联系电话) values(${线路编号},${线路名称},${管理单位},${收运时间段},${车牌号},${司机},${联系电话});

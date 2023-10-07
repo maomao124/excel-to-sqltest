@@ -12,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -40,6 +42,18 @@ public class FileServiceImpl implements FileService
     public void write(List<String> sqlList)
     {
         String path = baseConfigurationProperties.getOutputPath();
+        boolean appendTime = baseConfigurationProperties.isAppendTime();
+        String appendTimeFormat = baseConfigurationProperties.getAppendTimeFormat();
+        if (appendTime)
+        {
+            //需要追加时间
+            int index = path.lastIndexOf(".");
+            String startSubstring = path.substring(0, index);
+            String endSubstring = path.substring(index);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(appendTimeFormat);
+            String format = simpleDateFormat.format(new Date());
+            path = startSubstring + "-" + format + endSubstring;
+        }
         log.debug("输出文件位置：" + path);
         try (FileOutputStream fileOutputStream = new FileOutputStream(path);
              OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
