@@ -201,7 +201,7 @@ public class ExcelServiceImpl implements ExcelService
      */
     private ExcelData executeExcelDataHandler(ExcelData excelData) throws IOException
     {
-        if (excelDataHandlerList != null)
+        if (excelDataHandlerList != null && excelDataHandlerList.size() > 0)
         {
             excelDataHandlerList.sort(Comparator.comparingInt(ExcelDataHandler::getOrder));
             //相当于：

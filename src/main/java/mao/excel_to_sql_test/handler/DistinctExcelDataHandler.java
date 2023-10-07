@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
  * Date(创建日期)： 2023/10/6
  * Time(创建时间)： 13:28
  * Version(版本): 1.0
- * Description(描述)： 字段去重处理器
+ * Description(描述)： 字段去重excel数据处理器
  */
 
 @Component

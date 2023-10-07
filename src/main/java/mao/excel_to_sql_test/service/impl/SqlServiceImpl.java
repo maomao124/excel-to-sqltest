@@ -1,6 +1,8 @@
 package mao.excel_to_sql_test.service.impl;
 
 import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.handler.ExcelDataHandler;
+import mao.excel_to_sql_test.handler.SqlDataHandler;
 import mao.excel_to_sql_test.service.ExcelService;
 import mao.excel_to_sql_test.service.SqlService;
 import mao.excel_to_sql_test.service.TemplateService;
@@ -11,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.PropertyPlaceholderHelper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Project name(项目名称)：excel-to-sqltest
@@ -40,6 +39,9 @@ public class SqlServiceImpl implements SqlService
     @Autowired
     private ExcelService excelService;
 
+    @Autowired(required = false)
+    private List<SqlDataHandler> sqlDataHandlerList;
+
     @Override
     public List<String> excelToSql(String template, ExcelData excelData) throws Exception
     {
@@ -62,7 +64,7 @@ public class SqlServiceImpl implements SqlService
             log.debug("记录：" + result);
             index++;
         }
-        return sqlList;
+        return executeSqlDataHandler(template, excelData, sqlList);
     }
 
     @Override
@@ -70,5 +72,43 @@ public class SqlServiceImpl implements SqlService
     {
         ExcelData excelData = excelService.loadExcel();
         return excelToSql(template, excelData);
+    }
+
+    /**
+     * 执行sql数据处理器
+     *
+     * @param template  模板
+     * @param excelData excel数据
+     * @param sqlList   sql语句列表
+     * @return {@link List}<{@link String}>
+     */
+    private List<String> executeSqlDataHandler(String template, ExcelData excelData, List<String> sqlList)
+    {
+        if (sqlDataHandlerList != null && sqlDataHandlerList.size() > 0)
+        {
+            sqlDataHandlerList.sort(Comparator.comparingInt(SqlDataHandler::getOrder));
+            StringBuilder str = new StringBuilder("sql数据处理器执行顺序：");
+            for (SqlDataHandler sqlDataHandler : sqlDataHandlerList)
+            {
+                if (!sqlDataHandler.enabled())
+                {
+                    continue;
+                }
+                str.append("-->").append(sqlDataHandler.getName());
+            }
+            log.info(str.toString());
+            for (SqlDataHandler sqlDataHandler : sqlDataHandlerList)
+            {
+                if (!sqlDataHandler.enabled())
+                {
+                    log.info("sql数据处理器\"" + sqlDataHandler.getName() + "\"已关闭");
+                    continue;
+                }
+                log.info("开始进入\"" + sqlDataHandler.getName() + "\"");
+                sqlDataHandler.handler(excelData, template, sqlList);
+                log.info("退出\"" + sqlDataHandler.getName() + "\"");
+            }
+        }
+        return sqlList;
     }
 }

@@ -73,7 +73,7 @@ public class FileServiceImpl implements FileService
                 {
                     bufferedWriter.write("\n\n");
                 }
-                log.debug("写入到文件：" + sql);
+                //log.debug("写入到文件：" + sql);
             }
             bufferedWriter.flush();
             log.info("写入完成，一共" + sqlList.size() + "条数据");

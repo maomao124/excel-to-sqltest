@@ -52,9 +52,6 @@ public class RunServiceImpl implements RunService
     @Autowired
     private SqlDao sqlDao;
 
-    @Autowired(required = false)
-    private List<SqlDataHandler> sqlDataHandlerList;
-
     @Override
     public void showConfig()
     {
@@ -81,23 +78,54 @@ public class RunServiceImpl implements RunService
                 "7. 对于excel中性别字段为男或女，但是数据库为0或1的，可以使用if else解决，示例：'insert into student values(${年龄},<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)'\n" +
                 "8. 数据库配置位于 druid.properties 文件里\n" +
                 "9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范\n" +
-                "10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效\n\n" +
+                "10.程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效\n" +
+                "11.如果需要对数据进行加工处理，可以实现ExcelDataHandler或者SqlDataHandler接口来处理excel或者sql数据，可以参考AddressToGeoExcelDataHandler\n" +
+                "\n\n" +
                 "ets:\n" +
-                "  inputPath: './in.xlsx'    # excel文件的路径\n" +
+                "  inputPath: './in6.xlsx'    # excel文件的路径\n" +
                 "  outputPath: './out.sql'    # sql文件的输出路径\n" +
+                "  appendTime: false          # 输出文件的文件名的后面是否追加时间信息\n" +
+                "  appendTimeFormat: 'YYYYMMddHHmmss'   # 输出文件的文件名的后面追加时间信息的格式\n" +
                 "  isWriteToMysql: false      # 是否直接执行输出的sql文件\n" +
                 "  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\\n的个数\n" +
+                "  apiKey: 'hNrSgpC76vhq05xxxxxxxxxxxxxxx'   # 百度地图ak，用于通过详细地址生成经纬度信息\n" +
                 "  distinct: ''               # 要去重的字段\n" +
-                "  orderBy: ''                # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'\n" +
+                "  orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'\n" +
                 "  excel:\n" +
                 "    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1\n" +
                 "    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3\n" +
                 "    endRow: -1               # 结束行，值为-1默认读到最后一行\n" +
                 "    startCell: 0             # 开始列，默认从第一列开始读\n" +
                 "    endCell: -1              # 结束列，值为-1默认读到最后一列\n" +
-                "  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行\n" +
-                "    \"[编码]\": ['Noinfo','NotOnly','N000004-446-1151']\n" +
-                "    \"[所属班级]\": ['100001']" +
+                "  filter: # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行\n" +
+                "    \"[编码]\": [ 'Noinfo','NotOnly','N000004-446-1151' ]\n" +
+                "    \"[所属班级]\": [ '100001' ]\n" +
+                "    \"[联系电话]\": [ '' ]\n" +
+                "  handler:                   # 处理器\n" +
+                "    excelDataHandler:        # excel数据处理器\n" +
+                "      ignoreRowExcelDataHandler:  # 忽略行excel数据处理器，filter为此处理器的配置项\n" +
+                "        enable: true              # 是否启用此处理器\n" +
+                "        order: 0                  # 执行的优先级，数字越低，优先级越高，越先执行\n" +
+                "      distinctExcelDataHandler:   # 字段去重excel数据处理器，distinct为此处理器的配置项\n" +
+                "        enable: true\n" +
+                "        order: 1\n" +
+                "      orderByExcelDataHandler:    # 字段排序excel数据处理器，orderBy为此处理器的配置项\n" +
+                "        enable: true\n" +
+                "        order: 2\n" +
+                "      addressToGeoExcelDataHandler: # 详细地址转经纬度excel数据处理器，filedName为此处理器的配置项\n" +
+                "        enable: true\n" +
+                "        order: 20\n" +
+                "        filedName: 'address'       # 详细地址字段名称\n" +
+                "      printExcelDataHandler:      # 数据打印excel数据处理器\n" +
+                "        enable: true\n" +
+                "        order: 9998\n" +
+                "      saveExcelDataHandler:       # 保存excel数据处理器\n" +
+                "        enable: true\n" +
+                "        order: 9999\n" +
+                "    sqlDataHandler:           # sql数据处理器\n" +
+                "      printSqlDataHandler:     # 数据打印sql数据处理器\n" +
+                "        enable: true\n" +
+                "        order: 9998"+
                 "\n\n\n");
     }
 

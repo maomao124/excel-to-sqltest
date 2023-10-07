@@ -81,5 +81,9 @@ ets:
       saveExcelDataHandler:       # 保存excel数据处理器
         enable: true
         order: 9999
+    sqlDataHandler:           # sql数据处理器
+      printSqlDataHandler:     # 数据打印sql数据处理器
+        enable: true
+        order: 9998
 
 

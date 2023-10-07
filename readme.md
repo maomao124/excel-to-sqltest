@@ -20,6 +20,7 @@
 8. 数据库配置位于 druid.properties 文件里
 9. 如果直接想要使用默认的模板，可以直接按回车即可，使用默认模板时，excel里的表头列名称要满足数据库规范
 10. 程序通过配置属性类读取配置，配置文件示例如下，可以通过修改application.yml来修改配置，也可以通过参数传递来让配置临时生效
+11. 如果需要对数据进行加工处理，可以实现ExcelDataHandler或者SqlDataHandler接口来处理excel或者sql数据，可以参考AddressToGeoExcelDataHandler
 
 
 
@@ -31,11 +32,15 @@
 配置位于`application.yml`文件
 
 ```yaml
+
 ets:
-  inputPath: './in5.xlsx'    # excel文件的路径
+  inputPath: './in6.xlsx'    # excel文件的路径
   outputPath: './out.sql'    # sql文件的输出路径
+  appendTime: false          # 输出文件的文件名的后面是否追加时间信息
+  appendTimeFormat: 'YYYYMMddHHmmss'   # 输出文件的文件名的后面追加时间信息的格式
   isWriteToMysql: false      # 是否直接执行输出的sql文件
   wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
+  apiKey: 'hNrSgpC76vhq05xxxxxxxxxxxxxxx'   # 百度地图ak，用于通过详细地址生成经纬度信息
   distinct: ''               # 要去重的字段
   orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
   excel:
@@ -44,10 +49,35 @@ ets:
     endRow: -1               # 结束行，值为-1默认读到最后一行
     startCell: 0             # 开始列，默认从第一列开始读
     endCell: -1              # 结束列，值为-1默认读到最后一列
-  filter:                    # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
-    "[编码]": ['Noinfo','NotOnly','N000004-446-1151']
-    "[所属班级]": ['100001']
-    "[联系电话]": ['']        # 过滤联系电话为空的行
+  filter: # 过滤器，过滤掉满足以下条件的行，比如过滤掉‘所属班级’这一列中值为100001的行、过滤‘编码’字段值为‘Noinfo’、‘NotOnly’或者‘N000004-446-1151’的行
+    "[编码]": [ 'Noinfo','NotOnly','N000004-446-1151' ]
+    "[所属班级]": [ '100001' ]
+    "[联系电话]": [ '' ]
+  handler:                   # 处理器
+    excelDataHandler:        # excel数据处理器
+      ignoreRowExcelDataHandler:  # 忽略行excel数据处理器，filter为此处理器的配置项
+        enable: true              # 是否启用此处理器
+        order: 0                  # 执行的优先级，数字越低，优先级越高，越先执行
+      distinctExcelDataHandler:   # 字段去重excel数据处理器，distinct为此处理器的配置项
+        enable: true
+        order: 1
+      orderByExcelDataHandler:    # 字段排序excel数据处理器，orderBy为此处理器的配置项
+        enable: true
+        order: 2
+      addressToGeoExcelDataHandler: # 详细地址转经纬度excel数据处理器，filedName为此处理器的配置项
+        enable: true
+        order: 20
+        filedName: 'address'       # 详细地址字段名称
+      printExcelDataHandler:      # 数据打印excel数据处理器
+        enable: true
+        order: 9998
+      saveExcelDataHandler:       # 保存excel数据处理器
+        enable: true
+        order: 9999
+    sqlDataHandler:           # sql数据处理器
+      printSqlDataHandler:     # 数据打印sql数据处理器
+        enable: true
+        order: 9998
 ```
 
 
@@ -69,3 +99,288 @@ mvn package
 java -jar xxx.jar
 ```
 
+
+
+
+## handler
+
+有两类处理器
+* ExcelDataHandler
+* SqlDataHandler
+
+可以实现这两个接口的其中一个接口来对数据进行加工和过滤处理
+
+
+示例
+
+### AddressToGeoExcelDataHandler
+
+```java
+package mao.excel_to_sql_test.handler;
+
+import mao.excel_to_sql_test.config.BaseConfigurationProperties;
+import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.entity.Geo;
+import mao.excel_to_sql_test.service.AddressToGeoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Project name(项目名称)：excel-to-sqltest
+ * Package(包名): mao.excel_to_sql_test.handler
+ * Class(类名): AddressToGeoExcelDataHandler
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2023/10/7
+ * Time(创建时间)： 11:33
+ * Version(版本): 1.0
+ * Description(描述)： 详细地址转经纬度excel数据处理器
+ */
+
+@Component
+public class AddressToGeoExcelDataHandler implements ExcelDataHandler
+{
+
+    private static final Logger log = LoggerFactory.getLogger(DistinctExcelDataHandler.class);
+
+
+    @Autowired
+    private AddressToGeoService addressToGeoService;
+
+    /**
+     * 是否启用此handler，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.enable:true}")
+    private boolean enable;
+
+    /**
+     * 此handler的优先级，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.order:20}")
+    private int order;
+
+    /**
+     * 详细地址在表头里的名称，默认为address
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.filedName:address}")
+    private String filedName;
+
+
+    @Override
+    public boolean enabled()
+    {
+        return enable;
+    }
+
+    @Override
+    public int getOrder()
+    {
+        return order;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "详细地址转经纬度excel数据处理器";
+    }
+
+    @Override
+    public void handler(ExcelData excelData)
+    {
+        if (!excelData.getTitles().contains(filedName))
+        {
+            //没有详细地址字段
+            log.info("没有详细地址字段\"" + filedName + "\"，跳过执行");
+            return;
+        }
+        List<String> titles = excelData.getTitles();
+        List<Map<String, String>> content = excelData.getContent();
+        if (titles.contains("longitude") || titles.contains("latitude"))
+        {
+            log.warn("字段冲突! 已存在字段longitude或者latitude，跳过执行");
+            return;
+        }
+        try
+        {
+            log.info("开始向百度地图服务发起请求");
+            int index = 0;
+            for (Map<String, String> rowMap : content)
+            {
+                String address = rowMap.get(filedName);
+                index++;
+                if (address == null || address.equals(""))
+                {
+                    log.info("跳过" + index);
+                    continue;
+                }
+                //转换
+                Geo geo = addressToGeoService.addressToGeo(address);
+                log.info("已完成：" + index + "/" + rowMap.size() + " ，结果：" + geo);
+                rowMap.put("longitude", geo.getLongitude().toString());
+                rowMap.put("latitude", geo.getLatitude().toString());
+                rowMap.put("precise", geo.getPrecise().toString());
+                rowMap.put("confidence", geo.getConfidence().toString());
+                rowMap.put("comprehension", geo.getComprehension().toString());
+                rowMap.put("level", geo.getLevel());
+            }
+            log.info("请求完成");
+            //设置表头
+            titles.add("longitude");
+            titles.add("latitude");
+            titles.add("precise");
+            titles.add("confidence");
+            titles.add("comprehension");
+            titles.add("level");
+        }
+        catch (Exception e)
+        {
+            log.error("执行详细地址转经纬度excel数据处理器时发生错误：", e);
+        }
+    }
+}
+
+```
+
+
+
+### IgnoreRowExcelDataHandler
+
+```java
+package mao.excel_to_sql_test.handler;
+
+import mao.excel_to_sql_test.config.BaseConfigurationProperties;
+import mao.excel_to_sql_test.entity.ExcelData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+/**
+ * Project name(项目名称)：excel-to-sqltest
+ * Package(包名): mao.excel_to_sql_test.handler
+ * Class(类名): IgnoreRowExcelDataHandler
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2023/10/7
+ * Time(创建时间)： 9:20
+ * Version(版本): 1.0
+ * Description(描述)： 忽略行excel数据处理器
+ */
+
+@Component
+public class IgnoreRowExcelDataHandler implements ExcelDataHandler
+{
+
+    private static final Logger log = LoggerFactory.getLogger(DistinctExcelDataHandler.class);
+
+    @Autowired
+    private BaseConfigurationProperties baseConfigurationProperties;
+
+    /**
+     * 是否启用此handler，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.ignoreRowExcelDataHandler.enable:true}")
+    private boolean enable;
+
+    /**
+     * 此handler的优先级，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.ignoreRowExcelDataHandler.order:0}")
+    private int order;
+
+    @Override
+    public boolean enabled()
+    {
+        return enable;
+    }
+
+    @Override
+    public int getOrder()
+    {
+        return order;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "忽略行excel数据处理器";
+    }
+
+    @Override
+    public void handler(ExcelData excelData)
+    {
+        List<Map<String, String>> content = excelData.getContent();
+        try
+        {
+            List<Map<String, String>> contentNew = new ArrayList<>();
+            for (int i = 0; i < content.size(); i++)
+            {
+                Map<String, String> rowMap = content.get(i);
+                if (isIgnore(rowMap))
+                {
+                    //忽略
+                    log.info("忽略第" + (i + 1) + "行数据：" + rowMap);
+                }
+                else
+                {
+                    //log.debug("第" + (i + 1) + "行数据：" + rowMap);
+                    contentNew.add(rowMap);
+                }
+            }
+            excelData.setContent(contentNew);
+        }
+        catch (Exception e)
+        {
+            log.error("执行忽略行excel数据处理器时出现问题：", e);
+        }
+    }
+
+
+    /**
+     * 是否忽略当前行
+     *
+     * @param rowMap 行数据
+     * @return boolean 要忽略为是
+     */
+    private boolean isIgnore(Map<String, String> rowMap)
+    {
+        Map<String, List<String>> filter = baseConfigurationProperties.getFilter();
+        AtomicBoolean isIgnore = new AtomicBoolean(false);
+        rowMap.forEach((title, value) ->
+        {
+            //判断该列的表头是否在过滤列表里
+            if (filter.get(title) == null)
+            {
+                //不在过滤列表，直接下一个
+                return;
+            }
+            //表头在过滤列表里
+            List<String> list = filter.get(title);
+            for (String s : list)
+            {
+                if (s.equals(value))
+                {
+                    isIgnore.set(true);
+                    return;
+                }
+            }
+        });
+        return isIgnore.get();
+    }
+}
+
+```
