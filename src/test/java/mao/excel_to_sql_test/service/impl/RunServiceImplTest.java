@@ -337,4 +337,154 @@ class RunServiceImplTest
                 "");
 
     }
+
+
+    /**
+     * 用户表更新社区名称-投放点
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run21() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set community_name=(select community_name from base_community where community_id='${community_id}')" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
+
+    /**
+     * 用户表更新小区名称-投放点
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run22() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set village_name=(select village_name from base_village where village_id='${village_id}')" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
+
+    /**
+     * 用户表更投放点名称-投放点
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run23() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set put_name=(select put_name from base_put where put_id='${put_id}')" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
+
+
+    /**
+     * 用户表更名称-投放点
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run24() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set user_name=(CONCAT(" +
+                "(SELECT village_name FROM base_village WHERE village_id='${village_id}')," +
+                "'-',(SELECT put_name FROM base_put WHERE put_id='${put_id}')))" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
+
+    /**
+     * 用户表更新社区名称-社区
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run26() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set put_name=NULL , village_name=NULL" +
+                ", user_name=(select community_name from base_community where community_id='${community_id}')" +
+                ", community_name=(select community_name from base_community where community_id='${community_id}')" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
+
+    /**
+     * 用户表更新小区名称-小区-空社区
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run27() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set put_name=NULL" +
+                ", user_name=(select village_name from base_village where village_id='${village_id}')" +
+                ", village_name=(select village_name from base_village where village_id='${village_id}')" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
+
+    /**
+     * 用户表更新社区名称和id-小区-空社区
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run28() throws Exception
+    {
+        runService.run("" +
+                "update sys_user" +
+                " set community_id=(select community_id from base_village where village_id='${village_id}')" +
+                ", community_name=(select community_name from base_village where village_id='${village_id}')" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
+
+    /**
+     * 用户表更新小区名称-小区
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run29() throws Exception
+    {
+        runService.run("" +
+                "update sys_user set put_name=NULL" +
+                ", user_name=(select village_name from base_village where village_id='${village_id}')" +
+                ", village_name=(select village_name from base_village where village_id='${village_id}')" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
+
+
+    /**
+     * 用户表更新社区名称-小区-空社区
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run30() throws Exception
+    {
+        runService.run("" +
+                "update sys_user" +
+                " set " +
+                "community_name=(select community_name from base_village where village_id='${village_id}')" +
+                " where user_id='${user_id}';" +
+                "");
+
+    }
 }
