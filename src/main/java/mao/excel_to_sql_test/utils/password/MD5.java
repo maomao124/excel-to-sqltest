@@ -1,4 +1,4 @@
-package mao.excel_to_sql_test.utils;
+package mao.excel_to_sql_test.utils.password;
 
 /**
  * Project name(项目名称)：authority

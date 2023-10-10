@@ -1,4 +1,4 @@
-package mao.excel_to_sql_test.utils;
+package mao.excel_to_sql_test.utils.password;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
