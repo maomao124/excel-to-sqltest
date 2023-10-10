@@ -2,7 +2,7 @@ package mao.excel_to_sql_test.service.impl;
 
 
 import mao.excel_to_sql_test.service.PasswordEncoderService;
-import mao.excel_to_sql_test.utils.MD5;
+import mao.excel_to_sql_test.utils.password.MD5;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +24,12 @@ import org.springframework.stereotype.Service;
 public class MD5PasswordEncoderService implements PasswordEncoderService
 {
     private static final Logger log = LoggerFactory.getLogger(MD5PasswordEncoderService.class);
+
+    @Override
+    public String getAlgorithmName()
+    {
+        return "MD5";
+    }
 
     @Override
     public String encoder(String rawPassword)

@@ -1,7 +1,7 @@
 package mao.excel_to_sql_test.service.impl;
 
 import mao.excel_to_sql_test.service.PasswordEncoderService;
-import mao.excel_to_sql_test.utils.SHA1;
+import mao.excel_to_sql_test.utils.password.SHA1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,12 @@ import org.springframework.stereotype.Service;
 public class SHA1PasswordEncoderService implements PasswordEncoderService
 {
     private static final Logger log = LoggerFactory.getLogger(SHA1PasswordEncoderService.class);
+
+    @Override
+    public String getAlgorithmName()
+    {
+        return "SHA1";
+    }
 
     @Override
     public String encoder(String rawPassword)

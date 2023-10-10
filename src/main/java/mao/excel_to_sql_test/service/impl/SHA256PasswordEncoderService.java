@@ -1,7 +1,7 @@
 package mao.excel_to_sql_test.service.impl;
 
 import mao.excel_to_sql_test.service.PasswordEncoderService;
-import mao.excel_to_sql_test.utils.SHA256;
+import mao.excel_to_sql_test.utils.password.SHA256;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -23,6 +23,12 @@ import org.springframework.stereotype.Service;
 public class SHA256PasswordEncoderService implements PasswordEncoderService
 {
     private static final Logger log = LoggerFactory.getLogger(SHA256PasswordEncoderService.class);
+
+    @Override
+    public String getAlgorithmName()
+    {
+        return "SHA256";
+    }
 
     @Override
     public String encoder(String rawPassword)

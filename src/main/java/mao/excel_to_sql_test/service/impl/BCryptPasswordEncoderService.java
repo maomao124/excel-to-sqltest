@@ -2,7 +2,7 @@ package mao.excel_to_sql_test.service.impl;
 
 
 import mao.excel_to_sql_test.service.PasswordEncoderService;
-import mao.excel_to_sql_test.utils.BCryptPasswordEncoder;
+import mao.excel_to_sql_test.utils.password.BCryptPasswordEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -30,6 +30,12 @@ public class BCryptPasswordEncoderService implements PasswordEncoderService
     public BCryptPasswordEncoderService()
     {
         this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
+    }
+
+    @Override
+    public String getAlgorithmName()
+    {
+        return "BCrypt";
     }
 
     @Override

@@ -16,6 +16,13 @@ package mao.excel_to_sql_test.service;
 public interface PasswordEncoderService
 {
     /**
+     * 得到加密算法的名称
+     *
+     * @return {@link String} 算法名称，比如MD5,SHA1等
+     */
+    String getAlgorithmName();
+
+    /**
      * 将原始密码加密
      *
      * @param rawPassword 未进行加密的原始密码
