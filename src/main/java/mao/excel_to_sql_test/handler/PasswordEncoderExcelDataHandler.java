@@ -114,14 +114,17 @@ public class PasswordEncoderExcelDataHandler implements ExcelDataHandler
                 String algorithmName = passwordEncoderService.getAlgorithmName();
                 String encoderFiledName = filedName + "_" + algorithmName;
                 //开始转换
+                int index = 0;
                 for (Map<String, String> rowMap : content)
                 {
                     String rowPassword = rowMap.get(filedName);
+                    index++;
                     if (rowPassword == null)
                     {
                         continue;
                     }
                     String encoderPassword = passwordEncoderService.encoder(rowPassword);
+                    log.debug(index + "/" + content.size() + " 生成的加密字符串：" + encoderPassword);
                     rowMap.put(encoderFiledName, encoderPassword);
                 }
                 //设置表头
@@ -155,14 +158,17 @@ public class PasswordEncoderExcelDataHandler implements ExcelDataHandler
                 return;
             }
             //开始转换
+            int index = 0;
             for (Map<String, String> rowMap : content)
             {
                 String rowPassword = rowMap.get(filedName);
+                index++;
                 if (rowPassword == null)
                 {
                     continue;
                 }
                 String encoderPassword = passwordEncoderService.encoder(rowPassword);
+                log.debug(index + "/" + content.size() + " 生成的加密字符串：" + encoderPassword);
                 rowMap.put(filedName + "_" + algorithm, encoderPassword);
             }
             //设置表头
