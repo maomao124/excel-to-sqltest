@@ -15,29 +15,8 @@ import mao.excel_to_sql_test.entity.ExcelData;
  * Description(描述)： excel数据处理器接口
  */
 
-public interface ExcelDataHandler
+public interface ExcelDataHandler extends DataHandler
 {
-
-    /**
-     * 是否启用此处理器
-     *
-     * @return boolean 启用为true，否则为false
-     */
-    boolean enabled();
-
-    /**
-     * 得到处理器的执行顺序，数字越小，优先级越高
-     *
-     * @return int 处理器的执行顺序
-     */
-    int getOrder();
-
-    /**
-     * 得到excel数据处理器的名称
-     *
-     * @return {@link String} excel数据处理器名称
-     */
-    String getName();
 
     /**
      * 处理数据

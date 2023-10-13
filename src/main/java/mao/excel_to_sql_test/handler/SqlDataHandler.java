@@ -17,28 +17,8 @@ import java.util.List;
  * Description(描述)： sql数据处理器
  */
 
-public interface SqlDataHandler
+public interface SqlDataHandler extends DataHandler
 {
-    /**
-     * 是否启用此处理器
-     *
-     * @return boolean 启用为true，否则为false
-     */
-    boolean enabled();
-
-    /**
-     * 得到处理器的执行顺序，数字越小，优先级越高
-     *
-     * @return int 处理器的执行顺序
-     */
-    int getOrder();
-
-    /**
-     * 得到sql数据处理器的名称
-     *
-     * @return {@link String} sql数据处理器名称
-     */
-    String getName();
 
     /**
      * 处理数据
