@@ -119,7 +119,7 @@ public class PasswordEncoderExcelDataHandler implements ExcelDataHandler
                 {
                     String rowPassword = rowMap.get(filedName);
                     index++;
-                    if (rowPassword == null)
+                    if (rowPassword == null || rowPassword.equals(""))
                     {
                         continue;
                     }
@@ -163,7 +163,7 @@ public class PasswordEncoderExcelDataHandler implements ExcelDataHandler
             {
                 String rowPassword = rowMap.get(filedName);
                 index++;
-                if (rowPassword == null)
+                if (rowPassword == null || rowPassword.equals(""))
                 {
                     continue;
                 }
