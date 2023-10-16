@@ -1,10 +1,9 @@
-package mao.excel_to_sql_test.handler;
+package mao.excel_to_sql_test.handler.impl;
 
-import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.handler.SqlDataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
