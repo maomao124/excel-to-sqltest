@@ -487,4 +487,38 @@ class RunServiceImplTest
                 "");
 
     }
+
+    /**
+     * 导入合同内容
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run31() throws Exception
+    {
+        runService.run("" +
+                "insert into annual_contract_son (contract_son_id,contract_id," +
+                        "cartract_number,son_name,efficient,price,contract_unit,add_date,add_userid,tenant_id) " +
+                        "values('${_sid}','N000017-644-102','${序号}','${名称}','${规格}',${价格},'${单位}'," +
+                "now(),'N000017-418-1','N000017');"+
+                "");
+
+    }
+
+    /**
+     * 导入合同内容
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run32() throws Exception
+    {
+        runService.run("" +
+                "insert into annual_contract_son (contract_son_id,contract_id," +
+                "cartract_number,son_name,efficient,price,contract_unit,add_date,add_userid,tenant_id) " +
+                "values('${_sid}','N000017-569-1','${序号}','${名称}','${规格}',${价格},'${单位}'," +
+                "now(),'N000017-418-1','N000017');"+
+                "");
+
+    }
 }

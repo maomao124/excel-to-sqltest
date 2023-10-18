@@ -41,8 +41,8 @@ ets:
   isWriteToMysql: false      # 是否直接执行输出的sql文件
   wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
   apiKey: 'hNrSgpC76vhq05xxxxxxxxxxxxxxx'   # 百度地图ak，用于通过详细地址生成经纬度信息
-  distinct: ''               # 要去重的字段
-  orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
+  #distinct: ''               # 要去重的字段
+  #orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
   excel:
     sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1
     startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3
@@ -64,10 +64,28 @@ ets:
       orderByExcelDataHandler:    # 字段排序excel数据处理器，orderBy为此处理器的配置项
         enable: true
         order: 2
+      snowflakeIdExcelDataHandler: # 雪花算法ID生成excel数据处理器，filedName和machineCode为此处理器的配置项
+        enable: true
+        order: 8
+        filedName: '_sid'       # 生成的雪花算法ID列的列名称，默认为_sid
+        machineCode: 1          # 雪花算法的机器码，取值为0-31
       addressToGeoExcelDataHandler: # 详细地址转经纬度excel数据处理器，filedName为此处理器的配置项
         enable: true
         order: 20
         filedName: 'address'       # 详细地址字段名称
+      passwordEncoderExcelDataHandler: # 密码加密excel数据处理器
+        enable: false
+        order: 31
+        filedName: 'password'       # 密码字段在表头里的名称，默认为password
+        algorithm: 'BCrypt'         # 密码加密算法，默认为BCrypt，目前支持BCrypt、MD5、SHA1、SHA256算法，区分大小写
+        isAllTypeEncoder: true   # 是否加密密码字段，如果为true，则生成所有加密算法的加密字符串，如果为false，则生成algorithm配置对应的加密字符串
+      passwordVerificationExcelDataHandler: # 密码校验excel数据处理器
+        enable: false
+        order: 32
+        passwordFiledName: 'password'       # 密码字段在表头里的名称，默认为password
+        encoderPasswordFiledName: 'password_BCrypt'  # 加密后密码字段在表头里的名称，默认为password_BCrypt
+        verificationResultFiledName: 'passwordVerificationResult'    # 校验输出结果的字段名称，默认为passwordVerificationResult
+        algorithm: 'BCrypt'         # 密码加密算法，默认为BCrypt，目前支持BCrypt、MD5、SHA1、SHA256算法，区分大小写
       printExcelDataHandler:      # 数据打印excel数据处理器
         enable: true
         order: 9998
@@ -75,6 +93,9 @@ ets:
         enable: true
         order: 9999
     sqlDataHandler:           # sql数据处理器
+      transitionSqlDataHandler: # 事务sql数据处理器
+        enable: true
+        order: 10
       printSqlDataHandler:     # 数据打印sql数据处理器
         enable: true
         order: 9998
@@ -118,9 +139,9 @@ java -jar xxx.jar
 ```java
 package mao.excel_to_sql_test.handler;
 
-import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
 import mao.excel_to_sql_test.entity.Geo;
+import mao.excel_to_sql_test.handler.impl.DistinctExcelDataHandler;
 import mao.excel_to_sql_test.service.AddressToGeoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -257,6 +278,7 @@ package mao.excel_to_sql_test.handler;
 
 import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.handler.impl.DistinctExcelDataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -384,3 +406,105 @@ public class IgnoreRowExcelDataHandler implements ExcelDataHandler
 }
 
 ```
+
+
+### SnowflakeIdExcelDataHandler
+
+```java
+package mao.excel_to_sql_test.handler.impl;
+
+import mao.excel_to_sql_test.entity.ExcelData;
+import mao.excel_to_sql_test.handler.ExcelDataHandler;
+import mao.excel_to_sql_test.utils.id.SnowflakeIdGenerate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Project name(项目名称)：excel-to-sqltest
+ * Package(包名): mao.excel_to_sql_test.handler
+ * Class(类名): SnowflakeIdExcelDataHandler
+ * Author(作者）: mao
+ * Author QQ：1296193245
+ * GitHub：https://github.com/maomao124/
+ * Date(创建日期)： 2023/10/12
+ * Time(创建时间)： 9:49
+ * Version(版本): 1.0
+ * Description(描述)： 雪花算法ID生成excel数据处理器
+ */
+
+@Service
+public class SnowflakeIdExcelDataHandler implements ExcelDataHandler
+{
+
+    private static final Logger log = LoggerFactory.getLogger(PasswordEncoderExcelDataHandler.class);
+
+
+    /**
+     * 是否启用此handler，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.snowflakeIdExcelDataHandler.enable:true}")
+    private boolean enable;
+
+    /**
+     * 此handler的优先级，从配置文件里读取
+     */
+    @Value("${ets.handler.excelDataHandler.snowflakeIdExcelDataHandler.order:8}")
+    private int order;
+
+    /**
+     * 生成的雪花算法ID列的列名称，默认为_sid
+     */
+    @Value("${ets.handler.excelDataHandler.snowflakeIdExcelDataHandler.filedName:_sid}")
+    private String filedName;
+
+    /**
+     * 雪花算法的机器码，取值为0-31
+     */
+    @Value("${ets.handler.excelDataHandler.snowflakeIdExcelDataHandler.machineCode:1}")
+    private long machineCode;
+
+    @Override
+    public boolean enabled()
+    {
+        return enable;
+    }
+
+    @Override
+    public int getOrder()
+    {
+        return order;
+    }
+
+    @Override
+    public String getName()
+    {
+        return "雪花算法ID生成excel数据处理器";
+    }
+
+    @Override
+    public void handler(ExcelData excelData)
+    {
+        SnowflakeIdGenerate snowflakeIdGenerate = new SnowflakeIdGenerate(machineCode);
+        log.debug("机器码：" + machineCode);
+        List<Map<String, String>> content = excelData.getContent();
+        List<String> titles = excelData.getTitles();
+        for (Map<String, String> rowMap : content)
+        {
+            rowMap.put(filedName, snowflakeIdGenerate.generate().toString());
+        }
+        //设置表头
+        titles.add(0, filedName);
+    }
+}
+
+```
+
+
+
+## 模板示例
+

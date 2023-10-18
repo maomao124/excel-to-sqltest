@@ -89,8 +89,8 @@ public class RunServiceImpl implements RunService
                 "  isWriteToMysql: false      # 是否直接执行输出的sql文件\n" +
                 "  wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\\n的个数\n" +
                 "  apiKey: 'hNrSgpC76vhq05xxxxxxxxxxxxxxx'   # 百度地图ak，用于通过详细地址生成经纬度信息\n" +
-                "  distinct: ''               # 要去重的字段\n" +
-                "  orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'\n" +
+                "  #distinct: ''               # 要去重的字段\n" +
+                "  #orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'\n" +
                 "  excel:\n" +
                 "    sheetAt: 0               # 读取sheet的索引，从0开始，第一个sheet就是0，第二个sheet就是1\n" +
                 "    startRow: 0              # 开始行，选择要从第几行开始读，从0开始，开始行必须为表头，从第4行开始就是3\n" +
@@ -112,10 +112,28 @@ public class RunServiceImpl implements RunService
                 "      orderByExcelDataHandler:    # 字段排序excel数据处理器，orderBy为此处理器的配置项\n" +
                 "        enable: true\n" +
                 "        order: 2\n" +
+                "      snowflakeIdExcelDataHandler: # 雪花算法ID生成excel数据处理器，filedName和machineCode为此处理器的配置项\n" +
+                "        enable: true\n" +
+                "        order: 8\n" +
+                "        filedName: '_sid'       # 生成的雪花算法ID列的列名称，默认为_sid\n" +
+                "        machineCode: 1          # 雪花算法的机器码，取值为0-31\n" +
                 "      addressToGeoExcelDataHandler: # 详细地址转经纬度excel数据处理器，filedName为此处理器的配置项\n" +
                 "        enable: true\n" +
                 "        order: 20\n" +
                 "        filedName: 'address'       # 详细地址字段名称\n" +
+                "      passwordEncoderExcelDataHandler: # 密码加密excel数据处理器\n" +
+                "        enable: false\n" +
+                "        order: 31\n" +
+                "        filedName: 'password'       # 密码字段在表头里的名称，默认为password\n" +
+                "        algorithm: 'BCrypt'         # 密码加密算法，默认为BCrypt，目前支持BCrypt、MD5、SHA1、SHA256算法，区分大小写\n" +
+                "        isAllTypeEncoder: true   # 是否加密密码字段，如果为true，则生成所有加密算法的加密字符串，如果为false，则生成algorithm配置对应的加密字符串\n" +
+                "      passwordVerificationExcelDataHandler: # 密码校验excel数据处理器\n" +
+                "        enable: false\n" +
+                "        order: 32\n" +
+                "        passwordFiledName: 'password'       # 密码字段在表头里的名称，默认为password\n" +
+                "        encoderPasswordFiledName: 'password_BCrypt'  # 加密后密码字段在表头里的名称，默认为password_BCrypt\n" +
+                "        verificationResultFiledName: 'passwordVerificationResult'    # 校验输出结果的字段名称，默认为passwordVerificationResult\n" +
+                "        algorithm: 'BCrypt'         # 密码加密算法，默认为BCrypt，目前支持BCrypt、MD5、SHA1、SHA256算法，区分大小写\n" +
                 "      printExcelDataHandler:      # 数据打印excel数据处理器\n" +
                 "        enable: true\n" +
                 "        order: 9998\n" +
@@ -123,9 +141,12 @@ public class RunServiceImpl implements RunService
                 "        enable: true\n" +
                 "        order: 9999\n" +
                 "    sqlDataHandler:           # sql数据处理器\n" +
+                "      transitionSqlDataHandler: # 事务sql数据处理器\n" +
+                "        enable: true\n" +
+                "        order: 10\n" +
                 "      printSqlDataHandler:     # 数据打印sql数据处理器\n" +
                 "        enable: true\n" +
-                "        order: 9998"+
+                "        order: 9998" +
                 "\n\n\n");
     }
 
