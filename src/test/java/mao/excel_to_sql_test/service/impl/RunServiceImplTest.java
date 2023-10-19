@@ -521,4 +521,18 @@ class RunServiceImplTest
                 "");
 
     }
+
+    /**
+     * 查询用户-in内容
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run33() throws Exception
+    {
+        runService.run("" +
+                "'${user_name}'," +
+                "");
+
+    }
 }

@@ -508,3 +508,75 @@ public class SnowflakeIdExcelDataHandler implements ExcelDataHandler
 
 ## 模板示例
 
+```sql
+insert into student values(${年龄},
+<#if 性别=='男'>0</#if><#if 性别=='女'>1</#if>)
+```
+
+
+```sql
+INSERT INTO `th_db`.`car_arrange_line` (`collector_user_id`, 
+`collector_user_name`, `line_name`, `collector_car_name`, `line_phone`, 
+`add_userid`, `add_date`, `modify_userid`, `modify_date`, `tenant_id`, 
+`collector_car_id`, `car_arrange_id`, `collection_line_id`,
+ `car_arrange_line_id`, `daily_count`, `api_map_id`, `high_speed`, `down_date`, `up_date`, 
+`memo`, `line_time`)
+ VALUES (NULL, '${司机}', NULL, '${车牌号}', 
+'${联系电话?number?c}', NULL, '2023-09-19 00:00:00', NULL, NULL, 
+'N000017', 'gzepi22091607', 
+(select car_arrange_id FROM car_arrange WHERE
+ year='${日期?number?number_to_datetime?string('yyyy-MM-dd HH:mm:ss')}' 
+AND dept_name='白云车队'),
+ NULL, 'bycd00${(_index?number+205)?c}', 0, NULL, NULL, NULL, NULL,
+ '白云车队·', '${收运时间段}');
+```
+
+
+```sql
+
+update sys_user set birth_date=CONCAT(SUBSTR(id_code,7,4),
+'-',SUBSTR(id_code,11,2),'-',SUBSTR(id_code,13,2)),
+user_type='<#if 岗位类型=='前端保洁工'>sanitation</#if>
+<#if 岗位类型=='驾驶员'>sj</#if><#if 岗位类型=='司乘'>sc</#if>
+<#if 岗位类型=='汽车维修工'>check</#if><#if 岗位类型=='勤杂人员'>qinza</#if>
+<#if 岗位类型=='管理人员'>gl</#if><#if 岗位类型=='其他'>other</#if>
+<#if 岗位类型=='压缩站操作工'>zzz</#if>'
+ where user_id='${(_index?number+202210120346)?c}';
+
+```
+
+
+```sql
+
+insert into annual_contract_son (contract_son_id,contract_id,
+cartract_number,son_name,efficient,price,contract_unit,add_date,add_userid,tenant_id) 
+values('${_sid}','N000017-644-102','${序号}','${名称}','${规格}',${价格},'${单位}',
+now(),'N000017-418-1','N000017');
+
+```
+
+```sql
+
+insert into sys_user 
+(user_id,user_code,tenant_id,add_date,phone_code,
+user_name,id_code,sex,nation,politics,linkman_phone,
+address,dept_name,dept_id,pory_type,entry_date,contract_limit,driver_code,
+native_place,household_registration,now_address,date_this_unit,
+subject_name,contract_start_time,contract_end_time,sign_contract_number,
+auditing) values('${(_index?number+202210120346)?c}','${联系电话?number?c}',
+'N000017',NOW(),'${联系电话?number?c}','${姓名}','${身份证号码}','
+<#if 性别=='男'>1</#if><#if 性别=='女'>0</#if>','${民族}',
+'<#if 政治面貌=='群众'>3</#if><#if 政治面貌=='共青团员'>2</#if><#if 政治面貌=='中共党员'>
+1</#if><#if 政治面貌=='无党派人士'>4</#if><#if 政治面貌=='民主党派'>5</#if>',
+'${联系电话?number?c}','${户籍地址}','雷州项目',
+(select dept_id from sys_dept where dept_name='雷州项目'),
+'${岗位类型}','${入职日期?number?number_to_datetime?string('yyyy/MM/dd')}',
+'${合同期限?number?number_to_datetime?string('yyyy/MM/dd')}','${驾驶证件号}',
+'${籍贯}','<#if 户籍=='本地城镇'>1</#if><#if 户籍=='本地农村'>2</#if><#if 户籍=='外地城镇'>3</#if>
+<#if 户籍=='外地农村'>4</#if>','${现住地址}',
+'${到本单位日期?number?number_to_datetime?string('yyyy/MM/dd')}',
+'${合同主体}','${合同开始日期?number?number_to_datetime?string('yyyy/MM/dd')}',
+'${合同结束日期?number?number_to_datetime?string('yyyy/MM/dd')}',
+'${第几次签合同?number}','1');
+
+```
