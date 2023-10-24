@@ -54,6 +54,36 @@ public class AddressToGeoExcelDataHandler implements ExcelDataHandler
     @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.filedName:address}")
     private String filedName;
 
+    /**
+     * 并发的时间间隔，单位是毫秒，百度地图限制了并发，如果参数填200，就是每秒处理5个，填50是20个
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.concurrencyInterval:200}")
+    private int concurrencyInterval;
+
+    /**
+     * 并发重试间隔，默认为3秒
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.concurrencyRetryInterval:3000}")
+    private int concurrencyRetryInterval;
+
+    /**
+     * 如果发生错误，是否需要添加表头信息，当只运行了一部分后报错时，原来的一部分数据也会保存
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.ifErrorAddTitle:false}")
+    private boolean ifErrorAddTitle;
+
+    /**
+     * 超时时间
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.timeout:60000}")
+    private int timeout;
+
+    /**
+     * 读取超时时间
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.readTimeout:30000}")
+    private int readTimeout;
+
 
     @Override
     public boolean enabled()
@@ -104,13 +134,18 @@ public class AddressToGeoExcelDataHandler implements ExcelDataHandler
                 }
                 //转换
                 Geo geo = addressToGeoService.addressToGeo(address);
-                log.info("已完成：" + index + "/" + rowMap.size() + " ，结果：" + geo);
-                rowMap.put("longitude", geo.getLongitude().toString());
-                rowMap.put("latitude", geo.getLatitude().toString());
-                rowMap.put("precise", geo.getPrecise().toString());
-                rowMap.put("confidence", geo.getConfidence().toString());
-                rowMap.put("comprehension", geo.getComprehension().toString());
+                log.info("已完成：" + index + "/" + content.size() + " ，结果：" + geo);
+                rowMap.put("longitude", geo.getLongitude() != null ? geo.getLongitude().toString() : null);
+                rowMap.put("latitude", geo.getLongitude() != null ? geo.getLatitude().toString() : null);
+                rowMap.put("precise", geo.getLongitude() != null ? geo.getPrecise().toString() : null);
+                rowMap.put("confidence", geo.getLongitude() != null ? geo.getConfidence().toString() : null);
+                rowMap.put("comprehension", geo.getLongitude() != null ? geo.getComprehension().toString() : null);
                 rowMap.put("level", geo.getLevel());
+                if (concurrencyInterval > 0)
+                {
+                    //限制并发
+                    Thread.sleep(concurrencyInterval);
+                }
             }
             log.info("请求完成");
             //设置表头
@@ -123,6 +158,16 @@ public class AddressToGeoExcelDataHandler implements ExcelDataHandler
         }
         catch (Exception e)
         {
+            if (ifErrorAddTitle)
+            {
+                //设置表头
+                titles.add("longitude");
+                titles.add("latitude");
+                titles.add("precise");
+                titles.add("confidence");
+                titles.add("comprehension");
+                titles.add("level");
+            }
             log.error("执行详细地址转经纬度excel数据处理器时发生错误：", e);
         }
     }

@@ -47,7 +47,7 @@ ets:
   appendTimeFormat: 'YYYYMMddHHmmss'   # 输出文件的文件名的后面追加时间信息的格式
   isWriteToMysql: false      # 是否直接执行输出的sql文件
   wrapNum: 1                 # sql文件两条sql之间换行的数量，也就是\n的个数
-  apiKey: 'hNrSgpC76vhq05xxxxxxxxxxxxxxx'   # 百度地图ak，用于通过详细地址生成经纬度信息
+  apiKey: ''   # 百度地图ak，用于通过详细地址生成经纬度信息
   #distinct: ''               # 要去重的字段
   #orderBy: 'FPS,desc'        # 要排序的列，列为表头名称，升序为asc，降序为desc，按姓名降序：'姓名,desc'，按成绩升序：'成绩,asc'
   excel:
@@ -80,6 +80,11 @@ ets:
         enable: true
         order: 20
         filedName: 'address'       # 详细地址字段名称
+        concurrencyInterval: 350   # 并发的时间间隔，单位是毫秒，百度地图限制了并发，如果参数填200，就是每秒处理5个，填50是20个
+        concurrencyRetryInterval: 3000  # 并发重试间隔，默认为3秒
+        ifErrorAddTitle: true      # 如果发生错误，是否需要添加表头信息，当只运行了一部分后报错时，原来的一部分数据也会保存
+        timeout: 60000             # 超时时间
+        readTimeout: 30000         # 读取超时时间
       passwordEncoderExcelDataHandler: # 密码加密excel数据处理器
         enable: false
         order: 31

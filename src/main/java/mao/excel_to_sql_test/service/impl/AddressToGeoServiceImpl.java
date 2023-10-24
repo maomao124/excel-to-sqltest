@@ -6,7 +6,10 @@ import cn.hutool.json.JSONUtil;
 import mao.excel_to_sql_test.config.BaseConfigurationProperties;
 import mao.excel_to_sql_test.entity.Geo;
 import mao.excel_to_sql_test.service.AddressToGeoService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,17 +34,62 @@ public class AddressToGeoServiceImpl implements AddressToGeoService
     @Autowired
     private BaseConfigurationProperties baseConfigurationProperties;
 
+    /**
+     * 并发重试间隔，默认为3秒
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.concurrencyRetryInterval:3000}")
+    private int concurrencyRetryInterval;
+
+    /**
+     * 超时时间
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.timeout:60000}")
+    private int timeout;
+
+    /**
+     * 读取超时时间
+     */
+    @Value("${ets.handler.excelDataHandler.addressToGeoExcelDataHandler.readTimeout:30000}")
+    private int readTimeout;
+
+    private static final Logger log = LoggerFactory.getLogger(AddressToGeoServiceImpl.class);
+
     @Override
     public Geo addressToGeo(String address)
     {
         String apiKey = baseConfigurationProperties.getApiKey();
         String url = "https://api.map.baidu.com/geocoding/v3/?address=" + address + "&output=json&ak=" + apiKey;
-        String body = HttpRequest.get(url).execute().body();
+        String body = HttpRequest.get(url).timeout(timeout).setReadTimeout(readTimeout).execute().body();
+        log.debug("响应体：" + body);
         JSONObject jsonObject = JSONUtil.parseObj(body);
         String message = jsonObject.getStr("message");
         if (message != null)
         {
-            throw new RuntimeException(message);
+            //当前并发量已经超过约定并发配额，限制访问
+            if (message.equals("当前并发量已经超过约定并发配额，限制访问"))
+            {
+                log.info("已被限制并发，" + concurrencyRetryInterval + "毫秒后重试");
+                try
+                {
+                    Thread.sleep(concurrencyRetryInterval);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+                //递归
+                return addressToGeo(address);
+            }
+            else
+            {
+                throw new RuntimeException(message);
+            }
+        }
+        String msg = jsonObject.getStr("msg");
+        if (msg != null && msg.equals("Internal Service Error:无相关结果"))
+        {
+            log.warn("地址 \"" + address + "\" 无结果");
+            return new Geo().setAddress(address).setTime(LocalDateTime.now());
         }
         JSONObject result = jsonObject.getJSONObject("result");
         Double precise = result.getDouble("precise");
