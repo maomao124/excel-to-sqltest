@@ -41,7 +41,7 @@ logging:
 
 
 ets:
-  inputPath: './in6.xlsx'    # excel文件的路径
+  inputPath: './in.xlsx'    # excel文件的路径
   outputPath: './out.sql'    # sql文件的输出路径
   appendTime: false          # 输出文件的文件名的后面是否追加时间信息
   appendTimeFormat: 'YYYYMMddHHmmss'   # 输出文件的文件名的后面追加时间信息的格式
@@ -77,7 +77,7 @@ ets:
         filedName: '_sid'       # 生成的雪花算法ID列的列名称，默认为_sid
         machineCode: 1          # 雪花算法的机器码，取值为0-31
       addressToGeoExcelDataHandler: # 详细地址转经纬度excel数据处理器，filedName为此处理器的配置项
-        enable: true
+        enable: false
         order: 20
         filedName: 'address'       # 详细地址字段名称
         concurrencyInterval: 350   # 并发的时间间隔，单位是毫秒，百度地图限制了并发，如果参数填200，就是每秒处理5个，填50是20个

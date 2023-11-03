@@ -535,4 +535,19 @@ class RunServiceImplTest
                 "");
 
     }
+
+    /**
+     * 根据详细地址生成经纬度
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run34() throws Exception
+    {
+        runService.run("" +
+                "update base_box set point='${longitude},${latitude}'" +
+                " where box_no='${box_no}' and dept_id='${dept_id}';" +
+                "");
+
+    }
 }
