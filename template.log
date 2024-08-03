@@ -3829,3 +3829,22 @@
 2023-10-08 17:10:26		./in6.xlsx		update sys_user set community_name=((select community_name from base_community where community_id='${community_id}') where user_id='${user_id}';
 2023-10-08 17:11:18		./in6.xlsx		update sys_user set community_name=(select community_name from base_community where community_id='${community_id}') where user_id='${user_id}';
 2023-10-08 17:15:15		./in6.xlsx		update sys_user set community_name=(select community_name from base_village where village_id='${village_id}') where user_id='${user_id}';
+2023-10-13 16:16:24		./in6.xlsx		{
+2023-10-14 20:04:46		./in6.xlsx		${_sid}
+2023-10-18 16:29:05		./in6.xlsx		insert into annual_contract_son (contract_son_id,contract_id,cartract_number,son_name,efficient,price,contract_unit,add_date,add_userid,tenant_id) values('${_sid}','N000017-644-102','${序号}','${名称}','${规格}',${价格},'${单位}','N000017-418-1','N000017');
+2023-10-18 16:33:11		./in6.xlsx		insert into annual_contract_son (contract_son_id,contract_id,cartract_number,son_name,efficient,price,contract_unit,add_date,add_userid,tenant_id) values('${_sid}','N000017-644-102','${序号}','${名称}','${规格}',${价格},'${单位}',now(),'N000017-418-1','N000017');
+2023-10-18 16:45:10		./in6.xlsx		insert into annual_contract_son (contract_son_id,contract_id,cartract_number,son_name,efficient,price,contract_unit,add_date,add_userid,tenant_id) values('${_sid}','N000017-569-1','${序号}','${名称}','${规格}',${价格},'${单位}',now(),'N000017-418-1','N000017');
+2023-10-18 18:33:42		./in6.xlsx		${user_name},
+2023-10-18 18:34:39		./in6.xlsx		'${user_name}',
+2023-10-19 12:24:20		./in6.xls		'${user_name}',
+2023-10-20 15:37:53		./in6.xlsx		insert into student (_sid,name,sex,age) values(${_sid},'${name}','${sex}',${age});
+2023-10-24 11:46:42		./in.xlsx		update base_box set point='${longitude},${latitude}' where box_no='${box_no}' and dept_id='${dept_id};
+2023-10-24 11:47:24		./in.xlsx		update base_box set point='${longitude},${latitude}' where box_no='${box_no}' and dept_id='${dept_id}';
+2023-11-06 09:31:00		./in.xlsx		insert into (auditing,dept_id,dept_code,dept_name,dept_level,is_novalid,add_userid,add_date,tenant_id) values('0','{dept_id}','${dept_code}','企业${dept_name}0000-${dept_name}9999','2','0','${add_userid}',now(),'jxstar');
+2023-11-06 09:32:39		./in.xlsx		insert into (auditing,dept_id,dept_code,dept_name,dept_level,is_novalid,add_userid,add_date,tenant_id) values('0','${dept_id}','${dept_code}','企业${dept_name}0000-${dept_name}9999','2','0','${add_userid}',now(),'jxstar');
+2023-11-06 09:33:13		./in.xlsx		insert into (auditing,dept_id,dept_code,dept_name,dept_level,is_novalid,add_userid,add_date,tenant_id) values('0','${dept_id?number?c}','${dept_code?number?c}','企业${dept_name?number?c}0000-${dept_name?number?c}9999','2','0','${add_userid}',now(),'jxstar');
+2023-11-06 09:36:31		./in.xlsx		insert into sys_dept (auditing,dept_id,dept_code,dept_name,dept_level,is_novalid,add_userid,add_date,tenant_id) values('0','${dept_id?number?c}','${dept_code?number?c}','企业${dept_name?number?c}0000-${dept_name?number?c}9999','2','0','${add_userid}',now(),'jxstar');
+2023-11-06 09:48:43		./in.xlsx		insert into sys_dept (auditing,dept_id,dept_code,dept_name,dept_level,is_novalid,add_userid,add_date,tenant_id) values('0','${dept_id?number?c}','${dept_code?number?c}','企业${dept_name?number?c}0000-${dept_name?number?c}9999','2','0','${add_userid}',now(),'jxstar');
+2023-11-06 09:57:19		./in.xlsx		insert into sys_dept (auditing,dept_id,dept_code,dept_name,dept_level,is_novalid,add_userid,add_date,tenant_id) values('0','${dept_id?number?c}','${dept_code?number?c}','企业${dept_name?number?c}0000-${dept_name?number?c}9999','2','0','${add_userid}',now(),'jxstar');
+2023-11-06 09:58:19		./in.xlsx		insert into sys_dept (auditing,dept_id,dept_code,dept_name,dept_level,is_novalid,add_userid,add_date,tenant_id) values('0','${dept_id?number?c}','${dept_code?number?c}','企业${dept_name?number?c}0000-${dept_name?number?c}9999','2','0','${add_userid}',now(),'jxstar');
+2023-11-06 09:58:38		./in.xlsx		insert into sys_dept (auditing,dept_id,dept_code,dept_name,dept_level,is_novalid,add_userid,add_date,tenant_id) values('0','${dept_id?number?c}','${dept_code?number?c}','企业${dept_name?number?c}0000-${dept_name?number?c}9999','3','0','${add_userid}',now(),'jxstar');

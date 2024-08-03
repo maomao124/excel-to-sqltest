@@ -550,4 +550,22 @@ class RunServiceImplTest
                 "");
 
     }
+
+    /**
+     * 生成部门
+     *
+     * @throws Exception 异常
+     */
+    @Test
+    void run35() throws Exception
+    {
+        runService.run("" +
+                "insert into sys_dept (auditing,dept_id,dept_code,dept_name,dept_level," +
+                "is_novalid,add_userid,add_date,tenant_id) " +
+                "values('0','${dept_id?number?c}'," +
+                "'${dept_code?number?c}','企业${dept_name?number?c}0000-${dept_name?number?c}9999'," +
+                "'3','0','${add_userid}',now(),'jxstar');" +
+                "");
+
+    }
 }
