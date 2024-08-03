@@ -55,7 +55,7 @@ public class DevNumCreateExcelDataHandler implements ExcelDataHandler
     /**
      * 生成的列名称，默认为车牌号
      */
-    @Value("${ets.handler.excelDataHandler.snowflakeIdExcelDataHandler.filedName:车牌号}")
+    @Value("${ets.handler.excelDataHandler.devNumCreateExcelDataHandler.filedName:车牌号}")
     private String filedName;
 
     @Override

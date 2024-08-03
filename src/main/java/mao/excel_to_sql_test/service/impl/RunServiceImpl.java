@@ -127,6 +127,15 @@ public class RunServiceImpl implements RunService
                 "        ifErrorAddTitle: true      # 如果发生错误，是否需要添加表头信息，当只运行了一部分后报错时，原来的一部分数据也会保存\n" +
                 "        timeout: 60000             # 超时时间\n" +
                 "        readTimeout: 30000         # 读取超时时间\n" +
+                "      devNumCreateExcelDataHandler: # 车牌号生成excel数据处理器，filedName为此处理器的配置项\n" +
+                "        enable: true\n" +
+                "        order: 60\n" +
+                "        filedName: '车牌号'       # 车牌号字段名称\n" +
+                "        prefix: '豫P'            # 车牌号前缀\n" +
+                "      phoneCreateExcelDataHandler: # 手机号生成excel数据处理器，filedName为此处理器的配置项\n" +
+                "        enable: true\n" +
+                "        order: 70\n" +
+                "        filedName: '手机号'       # 手机号字段名称\n" +
                 "      passwordEncoderExcelDataHandler: # 密码加密excel数据处理器\n" +
                 "        enable: false\n" +
                 "        order: 31\n" +
