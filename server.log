@@ -18,3 +18,13 @@
 2024-08-03 16:17:19.465  INFO 27208 --- [main] m.e.s.impl.DevNumCreateServiceImplTest   : No active profile set, falling back to 1 default profile: "default"
 2024-08-03 16:17:19.779  INFO 27208 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
 2024-08-03 16:17:19.967  INFO 27208 --- [main] m.e.s.impl.DevNumCreateServiceImplTest   : Started DevNumCreateServiceImplTest in 0.765 seconds (JVM running for 1.295)
+2024-08-03 16:30:13.312  INFO 9172 --- [main] m.e.s.impl.PhoneCreateServiceImplTest    : Starting PhoneCreateServiceImplTest using Java 17.0.8.1 on mao with PID 9172 (started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2024-08-03 16:30:13.313 DEBUG 9172 --- [main] m.e.s.impl.PhoneCreateServiceImplTest    : Running with Spring Boot v2.7.1, Spring v5.3.21
+2024-08-03 16:30:13.314  INFO 9172 --- [main] m.e.s.impl.PhoneCreateServiceImplTest    : No active profile set, falling back to 1 default profile: "default"
+2024-08-03 16:30:13.636  INFO 9172 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2024-08-03 16:30:13.818  INFO 9172 --- [main] m.e.s.impl.PhoneCreateServiceImplTest    : Started PhoneCreateServiceImplTest in 0.772 seconds (JVM running for 1.296)
+2024-08-03 16:30:34.954  INFO 50488 --- [main] m.e.s.impl.PhoneCreateServiceImplTest    : Starting PhoneCreateServiceImplTest using Java 17.0.8.1 on mao with PID 50488 (started by mao in D:\程序\2023Q3\excel-to-sqltest)
+2024-08-03 16:30:34.955 DEBUG 50488 --- [main] m.e.s.impl.PhoneCreateServiceImplTest    : Running with Spring Boot v2.7.1, Spring v5.3.21
+2024-08-03 16:30:34.955  INFO 50488 --- [main] m.e.s.impl.PhoneCreateServiceImplTest    : No active profile set, falling back to 1 default profile: "default"
+2024-08-03 16:30:35.313  INFO 50488 --- [main] m.e.config.DataSourceConfig              : 初始化 DataSourceConfig
+2024-08-03 16:30:35.475  INFO 50488 --- [main] m.e.s.impl.PhoneCreateServiceImplTest    : Started PhoneCreateServiceImplTest in 0.75 seconds (JVM running for 1.267)
